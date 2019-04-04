@@ -1,24 +1,24 @@
 //
-//  ofxLayaerManager.cpp
+//  ofxLayerManager.cpp
 //  LayerSystem
 //
 //  Created by Nicole Messier on 3/25/19.
 //
 //
 
-#include "ofxLayaerManager.h"
+#include "ofxLayerManager.h"
 
-ofxLayaerManager::ofxLayaerManager()
+ofxLayerManager::ofxLayerManager()
 {
     
 }
 
-ofxLayaerManager::~ofxLayaerManager()
+ofxLayerManager::~ofxLayerManager()
 {
     
 }
 
-void ofxLayaerManager::setup()
+void ofxLayerManager::setup()
 {
     /*
      Parse Json
@@ -28,7 +28,7 @@ void ofxLayaerManager::setup()
     
     if(parsingJson)
     {
-        ofLogNotice("ofxLayaerManager::setup") << "Succesfully initial parse of " << jsonFilePath << " with data: " << jsonRef.getRawString();
+        ofLogNotice("ofxLayerManager::setup") << "Succesfully initial parse of " << jsonFilePath << " with data: " << jsonRef.getRawString();
         
         /*
          1. Set up initial layers
@@ -77,33 +77,18 @@ void ofxLayaerManager::setup()
                     
                     /*
                      
-                     string path,
-                     ofVec2f pos,
-                     ofVec2f size,
-                     int layer,
-                     float fps,
-                     string name,
-                     App::LoadType loadType,
-                     App::AnimationType animType,
-                     string next,
-                     int zone
+                    temp->setup(UID, pos, zone, layer);
                      
                      */
                     
-                    layers[layer.asInt()]->addMediaObject(path.asString(), // path
-                                                          ofVec2f(pos[0].asFloat(), pos[1].asFloat()), //pos
-                                                          ofVec2f(width.asFloat(),height.asFloat()), //size
-                                                          layer.asInt(), //layer
-                                                          fps.asFloat(), //fps
-                                                          name.asString(), //name
-                                                          static_cast<App::LoadType>(loadType.asInt()), //load type
-                                                          static_cast<App::AnimationType>(animType.asInt()), //animation type
-                                                          next.asString(), // next
-                                                          i); //zone
+                    layers[layer.asInt()]->addMediaObject(name.asString(),
+                                                          ofVec2f(pos[0].asFloat(), pos[1].asFloat()),
+                                                          zoneNum.asInt(),
+                                                          layer.asInt()); //zone
                 }
                 else
                 {
-                    ofLogError("ofxLayaerManager::setup") << "Object layer, " << layer.asInt() << ", is out of bounds!";
+                    ofLogError("ofxLayerManager::setup") << "Object layer, " << layer.asInt() << ", is out of bounds!";
                 }
             }
         }
@@ -128,18 +113,18 @@ void ofxLayaerManager::setup()
             }
             else
             {
-                ofLogError("ofxLayaerManager::setup") << "Object layer, " << layer.asInt() << ", is out of bounds!";
+                ofLogError("ofxLayerManager::setup") << "Object layer, " << layer.asInt() << ", is out of bounds!";
             }
             
         }
     }
     else
     {
-        ofLogError("ofxLayaerManager::setup") << "Unable to parse json";
+        ofLogError("ofxLayerManager::setup") << "Unable to parse json";
     }
 }
 
-void ofxLayaerManager::update(float dt)
+void ofxLayerManager::update(float dt)
 {
     for( auto & layer : layers)
     {
@@ -147,7 +132,7 @@ void ofxLayaerManager::update(float dt)
     }
 }
 
-void ofxLayaerManager::draw()
+void ofxLayerManager::draw()
 {
     for( auto & layer : layers)
     {
