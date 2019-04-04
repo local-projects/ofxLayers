@@ -48,7 +48,7 @@ private:
     int zone = 0;
     
     //Texure
-    ofTexture & tex;
+    ofTexture tex;
     
     
 };

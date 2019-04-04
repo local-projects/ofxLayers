@@ -1,5 +1,5 @@
 //
-//  ofxLayaerManager.hpp
+//  ofxLayerManager.hpp
 //  LayerSystem
 //
 //  Created by Nicole Messier on 3/25/19.
@@ -11,12 +11,12 @@
 #include "Layer.h"
 #include "ofxJson.h"
 
-class ofxLayaerManager
+class ofxLayerManager
 {
 public:
     
-    ofxLayaerManager();
-    ~ofxLayaerManager();
+    ofxLayerManager();
+    ~ofxLayerManager();
     
     void setup();
     void update(float dt);

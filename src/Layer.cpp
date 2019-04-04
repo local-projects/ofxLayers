@@ -64,28 +64,16 @@ void Layer::addBgImage(string imgPath)
     hasBgImage = true;
 }
 
-void Layer::addMediaObject(string path,
+void Layer::addMediaObject(string UID,
                            ofVec2f pos,
-                           ofVec2f size,
-                           int layer,
-                           float fps,
-                           string name,
-                           App::LoadType loadType,
-                           App::AnimationType animType,
-                           string next,
-                           int zone)
+                           int zone,
+                           int layer)
 {
     
-    ofLogNotice("Layer::addMediaObject") << "Adding media object, " << name << ", with path, " << path;
-    ofLogNotice("Layer::addMediaObject") << "Object-" << name << " size: " << size;
+    ofLogNotice("Layer::addMediaObject") << "Adding MediaObject-" << UID << " layer: " << layer;
     
     MediaObject * temp = new MediaObject();
-    temp->setup(path, pos, size, layer);
-    temp->setFPS(fps);
-    temp->setName(name);
-    temp->setTypes(loadType, animType);
-    temp->setNextOjbect(next);
-    temp->setZone(zone);
+    temp->setup(UID, pos, zone, layer);
     mediaObjects.push_back(temp);
     
 }
