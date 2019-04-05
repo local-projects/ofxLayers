@@ -29,6 +29,11 @@ public:
     void setNextOjbect(string _nextUID);
     void setZone(int _zone);
     
+    /*
+     Get Attributes
+     */
+    ofVec2f getPos();
+    
 private:
     
     //! Name of UID

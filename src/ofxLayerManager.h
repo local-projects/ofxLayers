@@ -22,6 +22,13 @@ public:
     void update(float dt);
     void draw();
     
+    /*
+     LAYERS
+     */
+    int getNumLayers();
+    Layer* getLayer(int index); 
+    
+    
 private:
     //! Layer Settings
     ofxJSONElement jsonRef;

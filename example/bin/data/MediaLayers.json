@@ -1,0 +1,89 @@
+{
+   "totalLayers":10,
+   "image-layers":[
+      {
+         "name":"background",
+         "path":"Assets/BG.png",
+         "layer":0
+      },
+      {
+         "name":"toplayer",
+         "path":"Assets/TopLayer.png",
+         "layer":1
+      }
+   ],
+   "zones":[
+      {
+         "zone-number":0,
+         "width":1080.0,
+         "height":1920.0,
+         "animations":[
+            {
+               "name":"Panda0",
+               "fps":30.0,
+               "load-type":0, // 0 = STREAMING, 1=PRE_LOADED
+               "animation-type":0, // 0 = IMAGE_SEQUENCE, 1 = TRAVERSING, 2 = ROTATING, 3 = WIGGLING
+               "path":"assets/pandas/panda0.jpeg",
+               "position":[
+                  0.0,
+                  0.0
+               ],
+               "layer":7,
+               "width": 238.0,
+               "height": 212.0,
+               "next": ""
+            },
+            {
+               "name":"Panda1",
+               "fps":30.0,
+               "load-type":0,
+               "animation-type":0,
+               "path":"assets/pandas/panda1.jpeg",
+               "position":[
+                  500.0,
+                  1200.0
+               ],
+               "layer":9,
+               "width":238.0,
+               "height":212.0,
+               "next": ""
+            }
+         ]
+      },
+      {
+         "zone-number":1,
+         "animations":[
+            {
+               "name":"Panda2",
+               "fps":30.0,
+               "load-type":0,
+               "animation-type":0,
+               "path":"assets/pandas/panda2.jpeg",
+               "position":[
+                  500.0,
+                  600.0
+               ],
+               "layer":8,
+               "width":238.0,
+               "height":212.0,
+               "next": ""
+            },
+            {
+               "name":"Panda3",
+               "fps":30.0,
+               "load-type":0,
+               "animation-type":0,
+               "path":"assets/pandas/panda3.jpeg",
+               "position":[
+                  199.0,
+                  100.0
+               ],
+               "layer":8,
+               "width":238.0,
+               "height":212.0,
+               "next": ""
+            }
+         ]
+      }
+   ]
+}

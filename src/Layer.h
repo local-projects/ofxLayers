@@ -33,6 +33,10 @@ public:
                         int zone,
                         int layer);
     
+    MediaObject *getObject( string UID);
+    string getMediaObjectUID(int index); 
+    int getNumMediaObjects();
+    
 private:
     
     //! Visibility
@@ -43,5 +47,6 @@ private:
     bool hasBgImage = false; 
     
     //Replace this image with the media system
-    vector<MediaObject*> mediaObjects;
+    map<string, MediaObject*> mediaObjects;
+    vector<string> mediaObjectIds;
 };
