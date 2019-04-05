@@ -140,3 +140,16 @@ void ofxLayerManager::draw()
     }
 }
 
+#pragma mark LAYERS
+int ofxLayerManager::getNumLayers()
+{
+    return layers.size();
+}
+
+Layer* ofxLayerManager::getLayer(int index)
+{
+    if(index >= layers.size())
+        return nullptr;
+    
+    return layers[index];
+}

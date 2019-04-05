@@ -79,3 +79,9 @@ void MediaObject::setZone(int _zone)
     zone = _zone;
 }
 
+#pragma mark GET
+
+ofVec2f MediaObject::getPos()
+{
+    return pos; 
+}

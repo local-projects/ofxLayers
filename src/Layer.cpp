@@ -40,8 +40,8 @@ void Layer::draw(){
     // Draw media Objects
     for(auto &obj : mediaObjects)
     {
-        obj->draw();
-        obj->drawDebug();
+        obj.second->draw();
+        obj.second->drawDebug();
     }
 }
 
@@ -73,8 +73,30 @@ void Layer::addMediaObject(string UID,
     ofLogNotice("Layer::addMediaObject") << "Adding MediaObject-" << UID << " layer: " << layer;
     
     MediaObject * temp = new MediaObject();
-    temp->setup(UID, pos, zone, layer);
-    mediaObjects.push_back(temp);
+    temp->setup(ofToUpper(UID), pos, zone, layer);
+    
+    
+    mediaObjects.insert(pair<string, MediaObject*>(ofToUpper(UID), temp));
+    
+    mediaObjectIds.push_back(ofToUpper(UID));
     
 }
 
+MediaObject * Layer::getObject( string UID)
+{
+    return mediaObjects.find(UID)->second; 
+}
+
+int Layer::getNumMediaObjects()
+{
+    return mediaObjects.size();
+}
+
+string Layer::getMediaObjectUID(int index)
+{
+    if(index >= mediaObjectIds.size())
+        return;
+    
+    return mediaObjectIds[index];
+    
+}
