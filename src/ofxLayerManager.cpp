@@ -69,10 +69,13 @@ void ofxLayerManager::setup()
                     //App::LoadType loadType,
                     //App::AnimationType animType,
                     
-                    const ofxJSONElement & path = newMediaObj["path"];
+                    //const ofxJSONElement & path = newMediaObj["path"];
                     const ofxJSONElement & pos = newMediaObj["position"];
-                    const ofxJSONElement & width = newMediaObj["width"];
-                    const ofxJSONElement & height = newMediaObj["height"];
+                    
+                    
+                    //const ofxJSONElement & width = newMediaObj["width"];
+                    //const ofxJSONElement & height = newMediaObj["height"];
+                    
                     const ofxJSONElement & next = newMediaObj["next"];
                     
                     /*
