@@ -15,7 +15,7 @@ public:
     MediaObject();
     ~MediaObject();
     
-    void setup(string _UID, ofVec2f _pos, int _zone, int _layer);
+    void setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer);
     void update(float dt);
     void draw();
     void drawDebug(); 
@@ -27,7 +27,7 @@ public:
     void setPosition(ofVec2f _pos);
     void setLayer(int _layer);
     void setNextOjbect(string _nextUID);
-    void setZone(int _zone);
+    void setZone(int _zoneOrder, string _zoneUID);
     
     /*
      Get Attributes
@@ -50,7 +50,8 @@ private:
     string nextUID = "";
     
     //! Zone
-    int zone = 0;
+    int zoneOrder = 0;
+    string zoneUID = "";
     
     //Texure
     ofTexture tex;

@@ -19,12 +19,13 @@ MediaObject::~MediaObject()
 }
 
 
-void MediaObject::setup(string _UID, ofVec2f _pos, int _zone, int _layer)
+void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer)
 {
 
     pos = _pos;
     layer = _layer;
-    zone = _zone;
+    zoneOrder = _zoneOrder;
+    zoneUID = _zoneUID; 
     layer = _layer;
     
     
@@ -46,7 +47,7 @@ void MediaObject::drawDebug()
     
     ofDrawBitmapString("UID: " + UID + "\n" +
                        "layer: " + ofToString(layer) + "\n" +
-                       "zone: " + ofToString(zone), pos.x, pos.y);
+                       "zoneUID: " + zoneUID, pos.x, pos.y);
     
     ofSetColor(255);
 }
@@ -74,9 +75,10 @@ void MediaObject::setNextOjbect(string _nextUID)
     nextUID = _nextUID;
 }
 
-void MediaObject::setZone(int _zone)
+void MediaObject::setZone(int _zoneOrder, string _zoneUID)
 {
-    zone = _zone;
+    zoneOrder = _zoneOrder;
+    zoneUID = _zoneUID;
 }
 
 #pragma mark GET
