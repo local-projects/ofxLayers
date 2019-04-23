@@ -55,6 +55,8 @@ void ofxLayerManager::setup()
             const ofxJSONElement & zoneUID = zones[i]["zone-uid"];
             const ofxJSONElement & animations = zones[i]["animations"];
             
+            zoneNames.push_back(zoneUID.asString());
+            
             for(int j = 0; j < animations.size(); j++)
             {
                 const ofxJSONElement & newMediaObj = animations[j];
@@ -90,6 +92,8 @@ void ofxLayerManager::setup()
                                                           zoneNum.asInt(),
                                                           zoneUID.asString(),
                                                           layer.asInt()); //zone
+                    
+                    animationsByZone.insert(pair<string, string>(ofToUpper(zoneUID.asString()), ofToUpper(name.asString()) ));
                 }
                 else
                 {

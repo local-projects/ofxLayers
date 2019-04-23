@@ -28,8 +28,13 @@ public:
     int getNumLayers();
     Layer* getLayer(int index); 
     
+    //NEED TO DO: temporary until MediaLayers is above this class
+    map<string, string> animationsByZone; //pair is <zoneUID, animationUID>
+    vector<string> zoneNames;
     
 private:
+    //NEED TO DO: Move this outside of the json file so that is more global
+    
     //! Layer Settings
     ofxJSONElement jsonRef;
     string jsonFilePath = "MediaLayers.json";
