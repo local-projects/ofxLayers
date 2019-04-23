@@ -66,14 +66,15 @@ void Layer::addBgImage(string imgPath)
 
 void Layer::addMediaObject(string UID,
                            ofVec2f pos,
-                           int zone,
+                           int zoneOrder,
+                           string zoneUID,
                            int layer)
 {
     
     ofLogNotice("Layer::addMediaObject") << "Adding MediaObject-" << UID << " layer: " << layer;
     
     MediaObject * temp = new MediaObject();
-    temp->setup(ofToUpper(UID), pos, zone, layer);
+    temp->setup(ofToUpper(UID), pos, zoneOrder, zoneUID, layer);
     
     
     mediaObjects.insert(pair<string, MediaObject*>(ofToUpper(UID), temp));

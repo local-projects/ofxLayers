@@ -30,7 +30,8 @@ public:
     //string _UID, ofVec2f _pos, int _zone, int _layer
     void addMediaObject(string UID,
                         ofVec2f pos,
-                        int zone,
+                        int zoneOrder,
+                        string zoneUID,
                         int layer);
     
     MediaObject *getObject( string UID);
