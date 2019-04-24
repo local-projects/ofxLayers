@@ -93,7 +93,7 @@ void ofxLayerManager::setup()
                                                           zoneUID.asString(),
                                                           layer.asInt()); //zone
                     
-                    animationsByZone.insert(pair<string, string>(ofToUpper(zoneUID.asString()), ofToUpper(name.asString()) ));
+                    animationsByZone.insert(pair<string, string>(ofToUpper(name.asString()), ofToUpper(zoneUID.asString()) ));
                 }
                 else
                 {
