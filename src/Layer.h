@@ -32,9 +32,10 @@ public:
                         ofVec2f pos,
                         int zoneOrder,
                         string zoneUID,
-                        int layer);
+                        int layer,
+                        LayerData::AnimationType animType);
     
-    MediaObject *getObject( string UID);
+    MediaObject *getMediaObject( string UID);
     string getMediaObjectUID(int index); 
     int getNumMediaObjects();
     

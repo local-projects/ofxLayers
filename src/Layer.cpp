@@ -25,7 +25,10 @@ void Layer::setup()
 
 void Layer::update(float dt)
 {
-    
+    for(auto & obj : mediaObjects)
+    {
+        obj.second->update(dt);
+    }
 }
 
 void Layer::draw(){
@@ -68,14 +71,15 @@ void Layer::addMediaObject(string UID,
                            ofVec2f pos,
                            int zoneOrder,
                            string zoneUID,
-                           int layer)
+                           int layer,
+                           LayerData::AnimationType animType)
 {
     
     ofLogNotice("Layer::addMediaObject") << "Adding MediaObject-" << UID << " layer: " << layer;
     
     MediaObject * temp = new MediaObject();
     temp->setup(ofToUpper(UID), pos, zoneOrder, zoneUID, layer);
-    
+    temp->setAnimationType(animType); 
     
     mediaObjects.insert(pair<string, MediaObject*>(ofToUpper(UID), temp));
     
@@ -83,7 +87,7 @@ void Layer::addMediaObject(string UID,
     
 }
 
-MediaObject * Layer::getObject( string UID)
+MediaObject * Layer::getMediaObject( string UID)
 {
     return mediaObjects.find(UID)->second; 
 }
