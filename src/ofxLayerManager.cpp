@@ -69,23 +69,7 @@ void ofxLayerManager::setup()
                     const ofxJSONElement & loadType = newMediaObj["load-type"];
                     const ofxJSONElement & _animType = newMediaObj["animation-type"];
                     
-                    //App::LoadType loadType,
-                    //App::AnimationType animType,
-                    
-                    //const ofxJSONElement & path = newMediaObj["path"];
-                    const ofxJSONElement & pos = newMediaObj["position"];
-                    
-                    
-                    //const ofxJSONElement & width = newMediaObj["width"];
-                    //const ofxJSONElement & height = newMediaObj["height"];
-                    
-                    const ofxJSONElement & next = newMediaObj["next"];
-                    
-                    /*
-                     
-                    temp->setup(UID, pos, zone, layer);
-                     
-                     */
+                     const ofxJSONElement & pos = newMediaObj["a_position"];
                     
                     /*
                    addMediaObject (string UID,
@@ -105,20 +89,60 @@ void ofxLayerManager::setup()
                                                           layer.asInt(),
                                                           animType); //zone
                     
+                    
+                    const ofxJSONElement & next = newMediaObj["next"];
+                    if(next.asString().size())
+                    {
+                        ofLogNotice("ofxLayerManager") << next.asString() << " next object for " << name.asString();
+                        
+                        layers[layer.asInt()]->getMediaObject(uid)->setNextObject(next.asString());
+                    }
+                    
+                    const ofxJSONElement & prev = newMediaObj["prev"];
+                    
+                    if(prev.asString().size())
+                    {
+                        ofLogNotice("ofxLayerManager") << prev.asString() << " prev object for " << name.asString();
+                        layers[layer.asInt()]->getMediaObject(uid)->setPrevObject(prev.asString());
+                    }
+                    
                     switch(animType)
                     {
                         case LayerData::IMAGE_SEQUENCE: { break; }
-                        case LayerData::TRAVERSING: {
+                        case LayerData::TRAVERSING_2_POINT: {
                             
-                            const ofxJSONElement & _endPos = newMediaObj["endPosition"];
-                            ofVec2f endPos = ofVec2f(_endPos[0].asFloat(), _endPos[1].asFloat());
-                            layers[layer.asInt()]->getMediaObject(uid)->setEndPos(endPos);
+                            const ofxJSONElement & duration1 = newMediaObj["duration1"];
+                            layers[layer.asInt()]->getMediaObject(uid)->setDuration1(duration1.asFloat());
+                            
+                            const ofxJSONElement & _B_Pos = newMediaObj["b_position"];
+                            ofVec2f B_Pos = ofVec2f(_B_Pos[0].asFloat(), _B_Pos[1].asFloat());
+                            layers[layer.asInt()]->getMediaObject(uid)->setB_Pos(B_Pos);
                                                                                                         
                             break;
                         }
                         case LayerData::ROTATING: { break; }
                         case LayerData::WIGGLING: { break; }
                         case LayerData::BOBBING: { break; }
+                        case LayerData::TRAVERSING_3_POINT: {
+                            
+                            const ofxJSONElement & duration1 = newMediaObj["duration1"];
+                            layers[layer.asInt()]->getMediaObject(uid)->setDuration1(duration1.asFloat());
+                            
+                            const ofxJSONElement & duration2 = newMediaObj["duration2"];
+                            layers[layer.asInt()]->getMediaObject(uid)->setDuration2(duration2.asFloat());
+                            
+                            
+                            const ofxJSONElement & _B_Pos = newMediaObj["b_position"];
+                            ofVec2f B_Pos = ofVec2f(_B_Pos[0].asFloat(), _B_Pos[1].asFloat());
+                            layers[layer.asInt()]->getMediaObject(uid)->setB_Pos(B_Pos);
+                            
+                            const ofxJSONElement & _C_Pos = newMediaObj["c_position"];
+                            ofVec2f C_Pos = ofVec2f(_C_Pos[0].asFloat(), _C_Pos[1].asFloat());
+                            layers[layer.asInt()]->getMediaObject(uid)->setC_Pos(C_Pos);
+                            
+                            break;
+                        }
+                        case LayerData::STATIC: { break; }
                         default: break;
                     }
                                                                                               
@@ -157,6 +181,16 @@ void ofxLayerManager::setup()
             }
             
         }
+        
+        for(int j = 0; j < layers.size(); j++)
+        {
+            for(int i = 0; i < layers[j]->getNumMediaObjects(); i++)
+            {
+                animationsByLayer.insert(pair<string, int>(ofToUpper(layers[j]->getMediaObjectUID(i)), j ));
+                
+                
+            }
+        }
     }
     else
     {
@@ -192,5 +226,22 @@ Layer* ofxLayerManager::getLayer(int index)
         return nullptr;
     
     return layers[index];
+}
+
+#pragma mark GET MEDIA OBJECT
+
+MediaObject *ofxLayerManager::getMediaObject(string UID)
+{
+    int layerIndex = animationsByLayer.find(UID)->second;
+    
+    if(layerIndex < layers.size())
+    {
+        return layers[layerIndex]->getMediaObject(UID);
+    }
+    else
+    {
+        return nullptr;
+    }
+    
 }
 
