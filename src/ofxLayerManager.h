@@ -29,8 +29,12 @@ public:
     Layer* getLayer(int index); 
     
     //NEED TO DO: temporary until MediaLayers is above this class
-    map<string, string> animationsByZone; //pair is <zoneUID, animationUID>
+    map<string, string> animationsByZone; //pair is <animationUID, zoneUID>
+    map<string, int> animationsByLayer; //pair is <animationUID, layerUID>
+    
     vector<string> zoneNames;
+    
+    MediaObject *getMediaObject(string UID);
     
 private:
     //NEED TO DO: Move this outside of the json file so that is more global
