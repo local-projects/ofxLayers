@@ -100,7 +100,7 @@ int Layer::getNumMediaObjects()
 string Layer::getMediaObjectUID(int index)
 {
     if(index >= mediaObjectIds.size())
-        return;
+        return "";
     
     return mediaObjectIds[index];
     

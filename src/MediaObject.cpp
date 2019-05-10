@@ -337,11 +337,13 @@ LayerData::AnimationType MediaObject::getAnimationType()
 void MediaObject::setDuration1(float _duration1)
 {
     duration1 = _duration1;
+	animFloat1.setDuration(duration1); 
 }
 
 void MediaObject::setDuration2(float _duration2)
 {
     duration2 = _duration2;
+	animFloat1.setDuration(duration2);
 }
 
 
