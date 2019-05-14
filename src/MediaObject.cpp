@@ -31,7 +31,7 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     
     animFloat1.reset(0);
     animFloat1.setRepeatType(PLAY_ONCE);
-    animFloat1.setDuration(duration1);
+    animFloat1.setDuration(ofRandom(1.5f, duration1));
     animFloat1.setCurve(LINEAR);
     ofAddListener(animFloat1.animFinished, this, &MediaObject::onAnim1Finish);
     
@@ -57,12 +57,10 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
 
 void MediaObject::update(float dt)
 {
+    float time = ofGetElapsedTimef();
     animFloat1.update(dt);
-    
-    if(animType == LayerData::TRAVERSING_3_POINT)
-    {
-        animFloat2.update(dt);
-    }
+    animFloat2.update(dt);
+    pause.update(dt);
     
     switch(animType)
     {
@@ -76,8 +74,8 @@ void MediaObject::update(float dt)
         case LayerData::WIGGLING: { break;}
         case LayerData::BOBBING:
         {
-            pos.x = A_Pos.x + bobDrift.x*animFloat1.val() + tex.getWidth()/2;
-            pos.y = A_Pos.y + bobDrift.y*animFloat1.val() + tex.getHeight()/2;
+            pos.x = A_Pos.x + (bobDrift.x + randomnBobVal.x*ofNoise(time) )*animFloat1.val() + tex.getWidth()/2;
+            pos.y = A_Pos.y + (bobDrift.y + randomnBobVal.y*ofNoise(time) )*animFloat1.val() + tex.getHeight()/2;
             break;
         }
         case LayerData::TRAVERSING_3_POINT: {
@@ -271,7 +269,7 @@ void MediaObject::sendPlayNextObject()
     
     //Send event via notification center
     ofxNotificationCenter::Notification mnd;
-    mnd.ID = notifyUID;
+    mnd.ID = LayerIDManager::one().playNextObject;
     
     if(nextUID.size())
     {
@@ -285,21 +283,11 @@ void MediaObject::sendPlayNextObject()
     }
 
 
-    ofxNotificationCenter::one().postNotification(notifyUID, mnd);
+    ofxNotificationCenter::one().postNotification(LayerIDManager::one().playNextObject, mnd);
     makeAnimationInvisible(); 
     
 }
 
-void MediaObject::setNotifyUID(string _notifyUID)
-{
-    notifyUID = _notifyUID; 
-    ofLogNotice("MediaObject") << "Set notification UID to " << notifyUID;
-}
-
-string MediaObject::getNotifyUID()
-{
-    return notifyUID; 
-}
 
 bool MediaObject::isFirstSequentialObject()
 {
@@ -402,9 +390,16 @@ void MediaObject::setAnimationState(AnimationState _animState)
     
     switch(animState)
     {
-        case AnimationState::STOPPED: { break; }
-        case AnimationState::PLAYING: { makeAnimationVisble(); break; }
-        case AnimationState::BRIEF_PAUSE: { break; }
+        case AnimationState::STOPPED: {
+            break;
+        }
+        case AnimationState::PLAYING: {
+            makeAnimationVisble();
+            break;
+        }
+        case AnimationState::BRIEF_PAUSE: {
+            break;
+        }
         default: break;
     }
 }
@@ -445,9 +440,22 @@ void MediaObject::makeAnimationInvisible()
     animationVisble = false;
 }
 
+#pragma mark BOBBING
+
 void MediaObject::setBobDrift(ofVec2f _bobDrift)
 {
+    ofLogNotice("MediaObject") << "bobDrift " << UID << " : " << bobDrift;
     bobDrift = _bobDrift;
+}
+
+void MediaObject::setBobRotation(float _bobRotation)
+{
+    bobRotation = _bobRotation; 
+}
+
+void MediaObject::setRandomnVariance(ofVec2f _randomnBobVal)
+{
+    randomnBobVal = _randomnBobVal;
 }
 
 #pragma mark ANIMATION CALLBACKS
@@ -460,15 +468,9 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         case LayerData::IMAGE_SEQUENCE:{ break;}
         case LayerData::TRAVERSING_2_POINT:
         {
-            if(sequentialObj)
-            {
-                sendPlayNextObject();
-                
-            }
-            else if(animState == AnimationState::PLAYING)
-            {
-                animFloat1.animateFromTo(0.0f, 1.0f);
-            }
+            
+            pause.animateFromTo(0.0f, 1.0f);
+            setAnimationState(AnimationState::BRIEF_PAUSE);
             break;
         }
         case LayerData::ROTATING:
@@ -496,9 +498,11 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         }
         case LayerData::TRAVERSING_3_POINT:
         {
+         
+            setAnimationState(AnimationState::BRIEF_PAUSE);
+            pause.animateFromTo(0.0f, 1.0f);
             animFloat2.reset(0.0f);
             
-            pause.animateFromTo(0.0f, 1.0f);
             break;
         }
         case LayerData::STATIC:{break;}
@@ -518,15 +522,8 @@ void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
         case LayerData::TRAVERSING_3_POINT:{
             
             
-            if(sequentialObj)
-            {
-                sendPlayNextObject();
-                
-            }
-            else if(animState == AnimationState::PLAYING)
-            {
-                animFloat1.animateFromTo(0.0f, 1.0f);
-            }
+            setAnimationState(AnimationState::BRIEF_PAUSE);
+            pause.animateFromTo(0.0f, 1.0f);
             
             break;
         }
@@ -540,21 +537,40 @@ void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
     switch(animType)
     {
         case LayerData::IMAGE_SEQUENCE:{ break;}
-        case LayerData::TRAVERSING_2_POINT:{break;}
+        case LayerData::TRAVERSING_2_POINT:{
+            
+            if(sequentialObj)
+            {
+                sendPlayNextObject();
+                setAnimationState(MediaObject::STOPPED);
+            }
+            else
+            {
+                animFloat1.animateFromTo(0.0f, 1.0f); 
+            }
+            
+            break;
+        }
         case LayerData::ROTATING:{break;}
         case LayerData::WIGGLING:{break;}
         case LayerData::BOBBING:{ break; }
         case LayerData::TRAVERSING_3_POINT:{
             
             
-            if(sequentialObj)
+            if(animState == AnimationState::BRIEF_PAUSE && !animFloat2.val())
+            {
+                animFloat2.animateFromTo(0.0f, 1.0f);
+                setAnimationState(MediaObject::PLAYING);
+            }
+            else if(sequentialObj)
             {
                 sendPlayNextObject();
-                
+                setAnimationState(MediaObject::STOPPED); 
             }
-            else if(animState == AnimationState::PLAYING)
+            else
             {
                 animFloat1.animateFromTo(0.0f, 1.0f);
+                setAnimationState(MediaObject::PLAYING);
             }
             
             break;
