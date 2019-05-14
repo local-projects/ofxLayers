@@ -11,6 +11,7 @@
 #include "LayerData.h"
 #include "ofxAnimatableFloat.h"
 #include "Global.h"
+#include "LayerIDManager.h"
 
 class MediaObject
 {
@@ -39,8 +40,6 @@ public:
     
     void setNextObject(string _nextUID);
     void setPrevObject(string _prevUID);
-    string getNotifyUID();
-    void setNotifyUID(string _notifyUID);
     bool isFirstSequentialObject();
     bool isSecondSequentialObject();
     
@@ -90,6 +89,8 @@ public:
     
     // BOBBING
     void setBobDrift(ofVec2f _bobDrift);
+    void setBobRotation(float _bobRotation);
+    void setRandomnVariance(ofVec2f _randomnBobVal);
     
     // Animation Callbacks
     void onAnim1Finish(ofxAnimatable::AnimationEvent & event);
@@ -120,7 +121,6 @@ private:
     string nextUID = "";
     string prevUID = "";
     bool sequentialObj = false;
-    string notifyUID = "playNextObject";
     void sendPlayNextObject();
     
     //! Zone
@@ -138,7 +138,7 @@ private:
     
     // Pause
     ofxAnimatableFloat pause;
-    float pauseDuration = 1.0f;
+    float pauseDuration = 0.0f;
     
     bool animationVisble = true;
     
@@ -154,6 +154,7 @@ private:
     //! bobDrift is the amount of drift from the startPos in both the x + y
     ofVec2f bobDrift = ofVec2f(5.0, 10.0f);
     float bobRotation = 2.5f;
+    ofVec2f randomnBobVal = ofVec2f(ofRandom(0.2f, 1.0f), ofRandom(0.2f, 1.0f));
     
     //debugging
     bool debug = false;
