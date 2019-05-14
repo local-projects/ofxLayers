@@ -41,6 +41,14 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     animFloat2.setCurve(LINEAR);
     ofAddListener(animFloat2.animFinished, this, &MediaObject::onAnim2Finish);
     
+    pause.reset(0);
+    pause.setRepeatType(PLAY_ONCE);
+    pause.setDuration(duration2);
+    pause.setCurve(LINEAR);
+    ofAddListener(pause.animFinished, this, &MediaObject::onPauseFinish);
+    
+    ofAddListener(animFloat2.animFinished, this, &MediaObject::onAnim2Finish);
+    
     
     ofAddListener(ofEvents().keyPressed, this, &MediaObject::onKeyPressed);
     
@@ -55,6 +63,47 @@ void MediaObject::update(float dt)
     {
         animFloat2.update(dt);
     }
+    
+    switch(animType)
+    {
+        case LayerData::IMAGE_SEQUENCE: {break;}
+        case LayerData::TRAVERSING_2_POINT:
+        {
+            pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
+            break;
+        }
+        case LayerData::ROTATING: { break;}
+        case LayerData::WIGGLING: { break;}
+        case LayerData::BOBBING:
+        {
+            pos.x = A_Pos.x + bobDrift.x*animFloat1.val() + tex.getWidth()/2;
+            pos.y = A_Pos.y + bobDrift.y*animFloat1.val() + tex.getHeight()/2;
+            break;
+        }
+        case LayerData::TRAVERSING_3_POINT: {
+            
+            
+            //Three point traversing
+            //Duraiton one is point A to B
+            //Duraiton two is point C to A
+            
+            if(animFloat1.isAnimating())
+            {
+                pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
+            }
+            else if(animFloat2.isAnimating())
+            {
+                pos = C_Pos + (A_Pos - C_Pos)*animFloat2.val();
+            }
+            
+            break;
+        }
+        case LayerData::STATIC: { break;}
+        default:break;
+    }
+
+    
+    
 }
 
 void MediaObject::draw()
@@ -86,11 +135,8 @@ void MediaObject::draw()
         }
         case LayerData::TRAVERSING_2_POINT:
         {
-
-            pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
             tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
            
-            
             if(debug)
             {
                 ofSetColor(ofColor::yellow);
@@ -124,20 +170,12 @@ void MediaObject::draw()
         {
             
             ofPushMatrix();
-            
-            
-            pos.x = A_Pos.x + bobDrift.x*animFloat1.val() + tex.getWidth()/2;
-            pos.y = A_Pos.y + bobDrift.y*animFloat1.val() + tex.getHeight()/2;
-            
             ofTranslate(pos.x, pos.y);
             
             float rotationVal = bobRotation*animFloat1.val();
             float rotationValMapped = ofMap(rotationVal, 0, bobRotation, -bobRotation/2, bobRotation/2);
-            
-            //ofLogNotice() << "rotationValMapped: " << rotationValMapped;
             ofRotateDeg(rotationValMapped);
-            //ofRotateDeg(Global::one().testing);
-            
+
             tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
             ofPopMatrix();
             break;
@@ -148,15 +186,6 @@ void MediaObject::draw()
             //Three point traversing
             //Duraiton one is point A to B
             //Duraiton two is point C to A
-            
-            if(animFloat1.isAnimating())
-            {
-                pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
-            }
-            else if(animFloat2.isAnimating())
-            {
-                pos = C_Pos + (A_Pos - C_Pos)*animFloat2.val();
-            }
             
             tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
             
@@ -416,6 +445,13 @@ void MediaObject::makeAnimationInvisible()
     animationVisble = false;
 }
 
+void MediaObject::setBobDrift(ofVec2f _bobDrift)
+{
+    bobDrift = _bobDrift;
+}
+
+#pragma mark ANIMATION CALLBACKS
+
 void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
 {
     
@@ -458,7 +494,13 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
             }
             break;
         }
-        case LayerData::TRAVERSING_3_POINT:{ animFloat2.animateFromTo(0.0f, 1.0f); break;}
+        case LayerData::TRAVERSING_3_POINT:
+        {
+            animFloat2.reset(0.0f);
+            
+            pause.animateFromTo(0.0f, 1.0f);
+            break;
+        }
         case LayerData::STATIC:{break;}
         default:break;
     }
@@ -493,10 +535,36 @@ void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
     }
 }
 
-void MediaObject::setBobDrift(ofVec2f _bobDrift)
+void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
 {
-    bobDrift = _bobDrift;
+    switch(animType)
+    {
+        case LayerData::IMAGE_SEQUENCE:{ break;}
+        case LayerData::TRAVERSING_2_POINT:{break;}
+        case LayerData::ROTATING:{break;}
+        case LayerData::WIGGLING:{break;}
+        case LayerData::BOBBING:{ break; }
+        case LayerData::TRAVERSING_3_POINT:{
+            
+            
+            if(sequentialObj)
+            {
+                sendPlayNextObject();
+                
+            }
+            else if(animState == AnimationState::PLAYING)
+            {
+                animFloat1.animateFromTo(0.0f, 1.0f);
+            }
+            
+            break;
+        }
+        case LayerData::STATIC:{break;}
+        default:break;
+    }
+
 }
+
 
 #pragma mark DEBUG
 

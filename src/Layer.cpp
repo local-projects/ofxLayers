@@ -33,6 +33,11 @@ void Layer::update(float dt)
 
 void Layer::draw(){
     
+    if(!isVisible)
+    {
+        return;
+    }
+    
     if(hasBgImage)
     {
         //Draw BackgroundImage
@@ -49,9 +54,9 @@ void Layer::draw(){
 }
 
 #pragma mark VISIBILITY
-void Layer::setIsVisble(bool visible)
+void Layer::setIsVisible(bool visible)
 {
-    
+    isVisible = visible;
 }
 
 #pragma mark MEDIA OBJECTS

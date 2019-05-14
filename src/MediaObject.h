@@ -74,10 +74,13 @@ public:
         BRIEF_PAUSE,
         NUM_ANIMATION_STATES
     };
+    AnimationState getAnimationState();
     
+    //Playing & Stopping
     void triggerPlay();
     void triggerStop();
     
+    //Visibility
     void makeAnimationVisble();
     void makeAnimationInvisible();
     
@@ -91,7 +94,10 @@ public:
     // Animation Callbacks
     void onAnim1Finish(ofxAnimatable::AnimationEvent & event);
     void onAnim2Finish(ofxAnimatable::AnimationEvent & event);
+    void onPauseFinish(ofxAnimatable::AnimationEvent & event);
     
+    // Pause
+    void setPauseDuration(float );
     
     //debug
     void setDebug(bool _debug); 
@@ -129,6 +135,9 @@ private:
     //Animation state
     AnimationState animState = AnimationState::STOPPED;
     void setAnimationState(AnimationState _animState);
+    
+    // Pause
+    ofxAnimatableFloat pause;
     float pauseDuration = 1.0f;
     
     bool animationVisble = true;
