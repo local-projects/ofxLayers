@@ -21,7 +21,7 @@ public:
     void draw();
     
     //! Visibility
-    void setIsVisble(bool visible);
+    void setIsVisible(bool visible);
     
     //! Media Objects
     // Each layer should only have one background image, so this function should only be called once
@@ -42,7 +42,7 @@ public:
 private:
     
     //! Visibility
-    bool isVisble = true;
+    bool isVisible = true;
     
     //! Media Objects
     ofImage * bgImage;
