@@ -360,7 +360,7 @@ void MediaObject::setDuration1(float _duration1)
 void MediaObject::setDuration2(float _duration2)
 {
     duration2 = _duration2;
-	animFloat1.setDuration(duration2);
+	animFloat2.setDuration(duration2);
 }
 
 
