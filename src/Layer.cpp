@@ -49,7 +49,7 @@ void Layer::draw(){
     for(auto &obj : mediaObjects)
     {
         obj.second->draw();
-        obj.second->drawDebug();
+        //obj.second->drawDebug();
     }
 }
 
