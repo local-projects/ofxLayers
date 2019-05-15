@@ -22,7 +22,7 @@ public:
     
     void setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer);
     void update(float dt);
-    void draw();
+    void draw(ofVec2f offset = ofVec2f(0.0f, 0.0f));
     void drawDebug(); 
     
     /*

@@ -104,7 +104,7 @@ void MediaObject::update(float dt)
     
 }
 
-void MediaObject::draw()
+void MediaObject::draw(ofVec2f offset)
 {
     
     if(!animationVisble)
@@ -115,7 +115,7 @@ void MediaObject::draw()
     switch(animType)
     {
         case LayerData::IMAGE_SEQUENCE: {
-            tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
             
             
             if(debug)
@@ -133,7 +133,7 @@ void MediaObject::draw()
         }
         case LayerData::TRAVERSING_2_POINT:
         {
-            tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
            
             if(debug)
             {
@@ -154,7 +154,7 @@ void MediaObject::draw()
         case LayerData::ROTATING: {
             ofPushMatrix();
             
-            ofTranslate(pos.x + tex.getWidth()/2, pos.y + tex.getHeight()/2);
+            ofTranslate(pos.x + tex.getWidth()/2 + offset.x, pos.y + tex.getHeight()/2 + offset.y);
             
             ofRotateDeg(360.0f*animFloat1.val());
             
@@ -168,7 +168,7 @@ void MediaObject::draw()
         {
             
             ofPushMatrix();
-            ofTranslate(pos.x, pos.y);
+            ofTranslate(pos.x + offset.x, pos.y + offset.y);
             
             float rotationVal = bobRotation*animFloat1.val();
             float rotationValMapped = ofMap(rotationVal, 0, bobRotation, -bobRotation/2, bobRotation/2);
@@ -185,7 +185,7 @@ void MediaObject::draw()
             //Duraiton one is point A to B
             //Duraiton two is point C to A
             
-            tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
             
             if(debug)
             {
@@ -204,7 +204,7 @@ void MediaObject::draw()
             break;
         }
         case LayerData::STATIC: {
-            tex.draw(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
             break;
         }
         default:break;
