@@ -206,11 +206,11 @@ void ofxLayerManager::update(float dt)
     }
 }
 
-void ofxLayerManager::draw()
+void ofxLayerManager::draw(ofVec2f offset)
 {
     for( auto & layer : layers)
     {
-        layer->draw();
+        layer->draw(offset);
     }
 }
 

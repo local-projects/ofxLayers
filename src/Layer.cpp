@@ -31,7 +31,7 @@ void Layer::update(float dt)
     }
 }
 
-void Layer::draw(){
+void Layer::draw(ofVec2f offset){
     
     if(!isVisible)
     {
@@ -48,7 +48,7 @@ void Layer::draw(){
     // Draw media Objects
     for(auto &obj : mediaObjects)
     {
-        obj.second->draw();
+        obj.second->draw(offset);
         //obj.second->drawDebug();
     }
 }
