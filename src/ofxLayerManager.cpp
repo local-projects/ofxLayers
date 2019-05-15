@@ -232,9 +232,19 @@ Layer* ofxLayerManager::getLayer(int index)
 
 MediaObject *ofxLayerManager::getMediaObject(string UID)
 {
-    int layerIndex = animationsByLayer.find(UID)->second;
-    
-    if(layerIndex < layers.size())
+	auto layerInfo = animationsByLayer.find(UID); 
+	map<string, int>::iterator it = animationsByLayer.find(UID);
+	
+
+	if (it == animationsByLayer.end())
+	{
+		return nullptr;
+	}
+
+	int layerIndex = animationsByLayer.find(UID)->second;
+	auto mediaObject = layers[layerIndex]->getMediaObject(UID);
+
+    if(layerIndex < layers.size() && mediaObject)
     {
         return layers[layerIndex]->getMediaObject(UID);
     }
