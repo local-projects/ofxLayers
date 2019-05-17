@@ -52,6 +52,12 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     
     ofAddListener(ofEvents().keyPressed, this, &MediaObject::onKeyPressed);
     
+    for(int i = 0; i < numAmplitudes; i++)
+    {
+        float* temp = new float;
+        amplitudes.push_back(temp);
+    }
+    
     
 }
 
@@ -71,7 +77,7 @@ void MediaObject::update(float dt)
             break;
         }
         case LayerData::ROTATING: { break;}
-        case LayerData::WIGGLING: { break;}
+        case LayerData::STEM: { break;}
         case LayerData::BOBBING:
         {
             pos.x = A_Pos.x + (bobDrift.x + randomnBobVal.x*ofNoise(time) )*animFloat1.val() + tex.getWidth()/2;
@@ -97,6 +103,7 @@ void MediaObject::update(float dt)
             break;
         }
         case LayerData::STATIC: { break;}
+        case LayerData::TWO_PT_SWAY: { break;}
         default:break;
     }
 
@@ -106,6 +113,7 @@ void MediaObject::update(float dt)
 
 void MediaObject::draw(ofVec2f offset)
 {
+    
     
     if(!animationVisble)
     {
@@ -163,7 +171,78 @@ void MediaObject::draw(ofVec2f offset)
             ofPopMatrix();
             break;
         }
-        case LayerData::WIGGLING: { break;}
+        case LayerData::STEM: {
+            
+            
+            ofMesh mesh;
+            mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+            
+            
+            //Create Values
+            float value0 = (*amplitudes[0])*animFloat1.val();
+            float value1 = (*amplitudes[1])*animFloat1.val();
+            float value2 = (*amplitudes[2])*animFloat1.val();
+            float value3 = (*amplitudes[3])*animFloat1.val();
+            float value4 = (*amplitudes[4])*animFloat1.val();
+            float value5 = (*amplitudes[5])*animFloat1.val();
+            float value6 = (*amplitudes[6])*animFloat1.val();
+            float value7 = (*amplitudes[7])*animFloat1.val();
+            
+            //Add positions
+            ofVec3f ml = ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()/2 );
+            ofVec3f tl = ofVec3f(A_Pos.x, A_Pos.y  );
+            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y  );
+            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()/2 ));
+            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()));
+            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()));
+        
+            
+            mesh.addVertex(ml); //half left
+            mesh.addVertex(tl); //top left
+            mesh.addVertex(tr); // top right
+            mesh.addVertex(mr); // half right
+            mesh.addVertex(br); // bottom right
+            mesh.addVertex(bl);
+            
+            mesh.addTexCoord(ofVec2f(0.0f, 0.5f)); //ml
+            mesh.addTexCoord(ofVec2f(0.0f, 0.0f)); //tl
+            mesh.addTexCoord(ofVec2f(1.0f, 0.0f)); //tr
+            mesh.addTexCoord(ofVec2f(1.0f, 0.5f)); //mr
+            mesh.addTexCoord(ofVec2f(1.0f, 1.0f)); //br
+            mesh.addTexCoord(ofVec2f(0.0f, 1.0f)); //bl
+            
+            
+            tex.bind();
+            {
+                mesh.draw();
+            }
+            tex.unbind();
+            
+            
+            if(!debug)
+            {
+                
+                ofSetColor(255, 0, 0);
+                ofNoFill();
+                
+                ofDrawCircle(tl.x, tl.y, circleSize);
+                ofDrawCircle(tr.x, tr.y, circleSize);
+                ofDrawCircle(mr.x, mr.y, circleSize);
+                ofDrawCircle(ml.x, ml.y, circleSize);
+                
+                ofDrawRectangle(tl.x, tl.y, tex.getWidth(), tex.getHeight());
+                
+                ofSetColor(ofColor::yellow);
+                //ofDrawBitmapString("pos: amp[0], amp[1]", tl.x - debugPos, tl.y);
+                //ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
+                ofFill();
+                ofSetColor(255);
+                
+                drawDebug();
+            }
+            
+            break;
+        }
         case LayerData::BOBBING:
         {
             
@@ -205,6 +284,71 @@ void MediaObject::draw(ofVec2f offset)
         }
         case LayerData::STATIC: {
             tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
+            break;
+        }
+        case LayerData::TWO_PT_SWAY: {
+            
+            ofMesh mesh;
+            mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+            
+            
+            //Create Values
+            float value0 = (*amplitudes[0])*animFloat1.val();
+            float value1 = (*amplitudes[1])*animFloat1.val();
+            float value2 = (*amplitudes[2])*animFloat1.val();
+            float value3 = (*amplitudes[3])*animFloat1.val();
+            
+            //Add positions
+            ofVec3f tl = ofVec3f(A_Pos.x + value0 , A_Pos.y + value1 );
+            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth() + value2, A_Pos.y + value3 );
+            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()));
+            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()));
+            
+            //Add verticies
+            mesh.addVertex(tl); //top left
+            mesh.addVertex(tr); // top right
+            mesh.addVertex(br); // bottom right
+            mesh.addVertex(bl); //bottom left
+            
+            //Add texture vertices
+            mesh.addTexCoord(ofVec2f(0.0f, 0.0f));
+            mesh.addTexCoord(ofVec2f(1, 0.0f));
+            mesh.addTexCoord(ofVec2f(1, 1));
+            mesh.addTexCoord(ofVec2f(0.0f, 1));
+            
+            
+            tex.bind();
+            {
+                mesh.draw();
+            }
+            tex.unbind();
+
+            
+            if(debug)
+            {
+                
+                ofSetColor(255, 0, 0);
+                ofNoFill();
+                
+                ofDrawCircle(tl.x, tl.y, circleSize);
+                ofDrawCircle(tr.x, tr.y, circleSize);
+                ofDrawCircle(br.x, br.y, circleSize);
+                ofDrawCircle(bl.x, bl.y, circleSize);
+                
+                ofDrawRectangle(tl.x, tl.y, tex.getWidth(), tex.getHeight());
+                
+                ofSetColor(ofColor::yellow);
+                //ofDrawBitmapString("pos: amp[0], amp[1]", tl.x - debugPos, tl.y);
+                //ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
+                ofFill();
+                ofSetColor(255);
+                
+                drawDebug();
+            }
+            
+            
+            
+            
             break;
         }
         default:break;
@@ -335,10 +479,16 @@ void MediaObject::setAnimationType( LayerData::AnimationType _animType)
             break;
         }
         case LayerData::ROTATING: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: ROTATING"; break;}
-        case LayerData::WIGGLING: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: WIGGLING"; break;}
+        case LayerData::STEM: {
+            ofLogNotice("MediaObject") << UID << " ANIMTYPE: STEM"; break;}
         case LayerData::BOBBING: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: BOBBING"; break;}
         case LayerData::TRAVERSING_3_POINT: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: TRAVERSING_3_POINT"; break;}
         case LayerData::STATIC: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: STATIC"; break;}
+        case LayerData::TWO_PT_SWAY: {
+            ofLogNotice("TWO_PT_SWAY") << UID << " ANIMTYPE: TWO_PT_SWAY";
+            
+            animFloat1.setCurve(EASE_IN_EASE_OUT);
+            break;}
         default:break;
     }
 }
@@ -393,11 +543,17 @@ void MediaObject::setAnimationState(AnimationState _animState)
         case AnimationState::STOPPED: {
             break;
         }
-        case AnimationState::PLAYING: {
+            case AnimationState::PLAYING: {
             makeAnimationVisble();
             break;
         }
         case AnimationState::BRIEF_PAUSE: {
+            
+            if(animType == LayerData::TWO_PT_SWAY)
+            {
+                //float val = animFloat1.val();
+                animFloat1.setRepeatType(PLAY_ONCE);
+            }
             break;
         }
         default: break;
@@ -414,10 +570,19 @@ void MediaObject::triggerPlay()
         case LayerData::IMAGE_SEQUENCE:{ break;}
         case LayerData::TRAVERSING_2_POINT:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
         case LayerData::ROTATING:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
-        case LayerData::WIGGLING:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
+        case LayerData::STEM:{
+            animFloat1.animateFromTo(0.0f, 1.0f);
+            animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
+            break;
+        }
         case LayerData::BOBBING:{ animFloat1.animateFromTo(0.0f, 1.0f); break; }
         case LayerData::TRAVERSING_3_POINT:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
         case LayerData::STATIC:{break;}
+        case LayerData::TWO_PT_SWAY:{
+            animFloat1.animateFromTo(0.0f, 1.0f);
+            animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
+            break;
+        }
         default:break;
     }
     
@@ -481,7 +646,7 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
             }
             break;
         }
-        case LayerData::WIGGLING:{break;}
+        case LayerData::STEM:{break;}
         case LayerData::BOBBING:
         {
             //ofLogNotice() << "animFloat1.val(): " << animFloat1.val();
@@ -506,6 +671,15 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
             break;
         }
         case LayerData::STATIC:{break;}
+        case LayerData::TWO_PT_SWAY:{
+            
+            if(animState == AnimationState::PLAYING)
+            {
+                animFloat1.animateFromTo(0.0f, 1.0f);
+            }
+            
+            break;
+        }
         default:break;
     }
 }
@@ -517,7 +691,7 @@ void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
         case LayerData::IMAGE_SEQUENCE:{ break;}
         case LayerData::TRAVERSING_2_POINT:{break;}
         case LayerData::ROTATING:{break;}
-        case LayerData::WIGGLING:{break;}
+        case LayerData::STEM:{break;}
         case LayerData::BOBBING:{ break; }
         case LayerData::TRAVERSING_3_POINT:{
             
@@ -528,6 +702,7 @@ void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
             break;
         }
         case LayerData::STATIC:{break;}
+        case LayerData::TWO_PT_SWAY:{break;}
         default:break;
     }
 }
@@ -552,7 +727,7 @@ void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
             break;
         }
         case LayerData::ROTATING:{break;}
-        case LayerData::WIGGLING:{break;}
+        case LayerData::STEM:{break;}
         case LayerData::BOBBING:{ break; }
         case LayerData::TRAVERSING_3_POINT:{
             
@@ -576,6 +751,7 @@ void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
             break;
         }
         case LayerData::STATIC:{break;}
+        case LayerData::TWO_PT_SWAY:{break;}
         default:break;
     }
 
@@ -598,4 +774,11 @@ void MediaObject::onKeyPressed(ofKeyEventArgs & args)
         case 'M': { debug = !debug; break; }
         default: break;
     }
+}
+
+#pragma mark MESH
+
+void MediaObject::setAmplitude(int index, float*amplitude)
+{
+    amplitudes[index] = amplitude; 
 }

@@ -101,7 +101,11 @@ public:
     void setPauseDuration(float );
     
     //debug
-    void setDebug(bool _debug); 
+    void setDebug(bool _debug);
+    
+    //mesh
+    void setAmplitude(int index, float* amplitude);
+    
 private:
     
     //! Name of UID
@@ -159,6 +163,12 @@ private:
     //debugging
     bool debug = false;
     void onKeyPressed(ofKeyEventArgs & args);
+
+    //Mesh Animations
+    vector<float*> amplitudes;
+    int numAmplitudes = 8;
+    float circleSize = 10.0f;
+    float debugPos = 100.f;
 };
 
 /*
@@ -167,10 +177,11 @@ private:
  case LayerData::IMAGE_SEQUENCE:{ break;}
  case LayerData::TRAVERSING_2_POINT:{break;}
  case LayerData::ROTATING:{break;}
- case LayerData::WIGGLING:{break;}
+ case LayerData::STEM:{break;}
  case LayerData::BOBBING:{ break; }
  case LayerData::TRAVERSING_3_POINT:{break;}
  case LayerData::STATIC:{break;}
+ case LayerData::TWO_PT_SWAY:{break;}
  default:break;
  }
 */
