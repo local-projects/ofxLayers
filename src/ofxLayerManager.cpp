@@ -121,7 +121,12 @@ void ofxLayerManager::setup()
                             break;
                         }
                         case LayerData::ROTATING: { break; }
-                        case LayerData::WIGGLING: { break; }
+                        case LayerData::STEM: {
+                            
+                            
+                            
+                            break;
+                        }
                         case LayerData::BOBBING: { break; }
                         case LayerData::TRAVERSING_3_POINT: {
                             
@@ -143,6 +148,7 @@ void ofxLayerManager::setup()
                             break;
                         }
                         case LayerData::STATIC: { break; }
+                        case LayerData::TWO_PT_SWAY:{break;}
                         default: break;
                     }
                                                                                               
