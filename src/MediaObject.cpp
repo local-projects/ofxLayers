@@ -189,10 +189,10 @@ void MediaObject::draw(ofVec2f offset)
             float value7 = (*amplitudes[7])*animFloat1.val();
             
             //Add positions
-            ofVec3f ml = ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()/2 );
-            ofVec3f tl = ofVec3f(A_Pos.x, A_Pos.y  );
-            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y  );
-            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()/2 ));
+            ofVec3f ml = ofVec3f(A_Pos.x + value0, A_Pos.y + tex.getHeight()/2 + value1);
+            ofVec3f tl = ofVec3f(A_Pos.x + value2, A_Pos.y  + value3);
+            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth() + value4, A_Pos.y + value5 );
+            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth() + value6, A_Pos.y + tex.getHeight()/2 + value7));
             ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()));
             ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()));
         
@@ -219,7 +219,7 @@ void MediaObject::draw(ofVec2f offset)
             tex.unbind();
             
             
-            if(!debug)
+            if(debug)
             {
                 
                 ofSetColor(255, 0, 0);
@@ -238,7 +238,6 @@ void MediaObject::draw(ofVec2f offset)
                 ofFill();
                 ofSetColor(255);
                 
-                drawDebug();
             }
             
             break;
@@ -343,7 +342,7 @@ void MediaObject::draw(ofVec2f offset)
                 ofFill();
                 ofSetColor(255);
                 
-                drawDebug();
+    
             }
             
             
@@ -354,6 +353,10 @@ void MediaObject::draw(ofVec2f offset)
         default:break;
     }
     
+    if(debug)
+    {
+        drawDebug();
+    }
     
     
 }
@@ -364,7 +367,8 @@ void MediaObject::drawDebug()
     
     ofDrawBitmapString("UID: " + UID + "\n" +
                        "layer: " + ofToString(layer) + "\n" +
-                       "zoneUID: " + zoneUID, pos.x, pos.y);
+                       "zoneUID: " + zoneUID + "\n" +
+                       "pos: " + ofToString(pos.x) + ", " + ofToString(pos.y), pos.x, pos.y);
     
     ofSetColor(255);
 }
@@ -480,14 +484,15 @@ void MediaObject::setAnimationType( LayerData::AnimationType _animType)
         }
         case LayerData::ROTATING: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: ROTATING"; break;}
         case LayerData::STEM: {
+            animFloat1.setCurve(EASE_IN_EASE_OUT);
             ofLogNotice("MediaObject") << UID << " ANIMTYPE: STEM"; break;}
         case LayerData::BOBBING: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: BOBBING"; break;}
         case LayerData::TRAVERSING_3_POINT: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: TRAVERSING_3_POINT"; break;}
         case LayerData::STATIC: { ofLogNotice("MediaObject") << UID << " ANIMTYPE: STATIC"; break;}
         case LayerData::TWO_PT_SWAY: {
             ofLogNotice("TWO_PT_SWAY") << UID << " ANIMTYPE: TWO_PT_SWAY";
-            
             animFloat1.setCurve(EASE_IN_EASE_OUT);
+            
             break;}
         default:break;
     }
@@ -549,10 +554,9 @@ void MediaObject::setAnimationState(AnimationState _animState)
         }
         case AnimationState::BRIEF_PAUSE: {
             
-            if(animType == LayerData::TWO_PT_SWAY)
+            if(animType == LayerData::TWO_PT_SWAY || animType == LayerData::STEM)
             {
-                //float val = animFloat1.val();
-                animFloat1.setRepeatType(PLAY_ONCE);
+                animFloat1.setRepeatType(LOOP_BACK_AND_FORTH_ONCE);
             }
             break;
         }
@@ -568,10 +572,20 @@ void MediaObject::triggerPlay()
     switch(animType)
     {
         case LayerData::IMAGE_SEQUENCE:{ break;}
-        case LayerData::TRAVERSING_2_POINT:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
+        case LayerData::TRAVERSING_2_POINT:{
+            
+            
+            animFloat1.animateFromTo(0.0f, 1.0f);
+            break;
+        }
         case LayerData::ROTATING:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
         case LayerData::STEM:{
-            animFloat1.animateFromTo(0.0f, 1.0f);
+            animFloat1.reset(0.0f);
+            
+            float delay =  ofRandom(1.0f, 3.0f);
+            animFloat1.animateToAfterDelay(1.0f, delay);
+            //animFloat1.animateFromTo(0.0f, 1.0f);
+            
             animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
             break;
         }
@@ -579,7 +593,10 @@ void MediaObject::triggerPlay()
         case LayerData::TRAVERSING_3_POINT:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
         case LayerData::STATIC:{break;}
         case LayerData::TWO_PT_SWAY:{
-            animFloat1.animateFromTo(0.0f, 1.0f);
+            float delay =  ofRandom(0.25f, 3.0f);
+            animFloat1.reset(0.0f);
+            animFloat1.animateToAfterDelay(1.0f, delay);
+            //animFloat1.animateFromTo(0.0f, 1.0f);
             animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
             break;
         }
@@ -640,13 +657,15 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         }
         case LayerData::ROTATING:
         {
+            break;
+        }
+        case LayerData::STEM:{
             if(animState == AnimationState::PLAYING)
             {
                 animFloat1.animateFromTo(0.0f, 1.0f);
             }
             break;
         }
-        case LayerData::STEM:{break;}
         case LayerData::BOBBING:
         {
             //ofLogNotice() << "animFloat1.val(): " << animFloat1.val();
@@ -672,12 +691,6 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         }
         case LayerData::STATIC:{break;}
         case LayerData::TWO_PT_SWAY:{
-            
-            if(animState == AnimationState::PLAYING)
-            {
-                animFloat1.animateFromTo(0.0f, 1.0f);
-            }
-            
             break;
         }
         default:break;
