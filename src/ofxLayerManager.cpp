@@ -165,28 +165,11 @@ void ofxLayerManager::setup()
         
         
         /*
-         3.  Parse Image layers
+         3.  Parse Background
          */
         
-        const ofxJSONElement & imageLayers = jsonRef["image-layers"];
-        
-        for(int i = 0; i < imageLayers.size(); i++)
-        {
-            const ofxJSONElement & newImage = imageLayers[i];
-            const ofxJSONElement & name = newImage["name"];
-            const ofxJSONElement & path = newImage["path"];
-            const ofxJSONElement & layer = newImage["layer"];
-            
-            if(layer.asInt() < layers.size())
-            {
-                layers[layer.asInt()]->addBgImage(path.asString());
-            }
-            else
-            {
-                ofLogError("ofxLayerManager::setup") << "Object layer, " << layer.asInt() << ", is out of bounds!";
-            }
-            
-        }
+        const ofxJSONElement & background = jsonRef["background-layer"];
+        layers[0]->addBgImage(background.asString());
         
         for(int j = 0; j < layers.size(); j++)
         {
