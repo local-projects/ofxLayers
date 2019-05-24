@@ -578,7 +578,10 @@ void MediaObject::triggerPlay()
             animFloat1.animateFromTo(0.0f, 1.0f);
             break;
         }
-        case LayerData::ROTATING:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
+        case LayerData::ROTATING:{
+            animFloat1.setDuration(12);
+            animFloat1.animateFromTo(0.0f, 1.0f);
+            break;}
         case LayerData::STEM:{
             animFloat1.reset(0.0f);
             
@@ -657,6 +660,11 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         }
         case LayerData::ROTATING:
         {
+            
+            if(animState == AnimationState::PLAYING)
+            {
+                animFloat1.animateFromTo(0.0f, 1.0f);
+            }
             break;
         }
         case LayerData::STEM:{
