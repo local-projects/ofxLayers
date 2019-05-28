@@ -219,7 +219,7 @@ void MediaObject::draw(ofVec2f offset)
             tex.unbind();
             
             
-            if(debug)
+            if(meshDebug)
             {
                 
                 ofSetColor(255, 0, 0);
@@ -232,9 +232,11 @@ void MediaObject::draw(ofVec2f offset)
                 
                 ofDrawRectangle(tl.x, tl.y, tex.getWidth(), tex.getHeight());
                 
-                ofSetColor(ofColor::yellow);
-                //ofDrawBitmapString("pos: amp[0], amp[1]", tl.x - debugPos, tl.y);
-                //ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
+                ofSetColor(ofColor::pink);
+                ofDrawBitmapString("pos: amp[0], amp[1]", ml.x - debugPos, ml.y);
+                ofDrawBitmapString("pos: amp[2], amp[3]", tl.x - debugPos, tl.y);
+                ofDrawBitmapString("pos: amp[4], amp[5]", tr.x, tr.y);
+                ofDrawBitmapString("pos: amp[6], amp[7]", mr.x, mr.y);
                 ofFill();
                 ofSetColor(255);
                 
@@ -323,7 +325,7 @@ void MediaObject::draw(ofVec2f offset)
             tex.unbind();
 
             
-            if(debug)
+            if(meshDebug)
             {
                 
                 ofSetColor(255, 0, 0);
@@ -336,9 +338,9 @@ void MediaObject::draw(ofVec2f offset)
                 
                 ofDrawRectangle(tl.x, tl.y, tex.getWidth(), tex.getHeight());
                 
-                ofSetColor(ofColor::yellow);
-                //ofDrawBitmapString("pos: amp[0], amp[1]", tl.x - debugPos, tl.y);
-                //ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
+                ofSetColor(ofColor::pink);
+                ofDrawBitmapString("pos: amp[0], amp[1]", tl.x - debugPos, tl.y);
+                ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
                 ofFill();
                 ofSetColor(255);
                 
@@ -784,6 +786,11 @@ void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
 void MediaObject::setDebug(bool _debug)
 {
     debug = _debug; 
+}
+
+void MediaObject::setMeshDebug(bool _meshDebug)
+{
+    meshDebug = _meshDebug;
 }
 
 #pragma mark CALLBACKS

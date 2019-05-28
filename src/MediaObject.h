@@ -102,6 +102,7 @@ public:
     
     //debug
     void setDebug(bool _debug);
+    void setMeshDebug(bool _meshDebug);
     
     //mesh
     void setAmplitude(int index, float* amplitude);
@@ -162,6 +163,7 @@ private:
     
     //debugging
     bool debug = false;
+    bool meshDebug = false;
     void onKeyPressed(ofKeyEventArgs & args);
 
     //Mesh Animations
