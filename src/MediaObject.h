@@ -78,7 +78,8 @@ public:
     //Playing & Stopping
     void triggerPlay();
     void triggerStop();
-    
+	void genericPlay(); 
+
     //Visibility
     void makeAnimationVisble();
     void makeAnimationInvisible();
@@ -154,6 +155,8 @@ private:
     //! Use animFloat2 for point C to A
     ofxAnimatableFloat animFloat2;
     float duration2 = 2.0f;
+
+	bool firstPlay = true; 
     
     //bobbing
     //! bobDrift is the amount of drift from the startPos in both the x + y
