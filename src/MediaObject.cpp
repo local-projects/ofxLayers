@@ -547,7 +547,10 @@ void MediaObject::setAnimationState(AnimationState _animState)
     
     switch(animState)
     {
-        case AnimationState::STOPPED: {
+        case AnimationState::STOPPED: 
+		{
+			animFloat1.pause(); 
+			animFloat2.pause(); 
             break;
         }
             case AnimationState::PLAYING: {
@@ -566,9 +569,22 @@ void MediaObject::setAnimationState(AnimationState _animState)
     }
 }
 
+void MediaObject::genericPlay()
+{
+	if (firstPlay)
+	{
+		animFloat1.animateFromTo(0.0f, 1.0f);
+		firstPlay = false;
+	}
+	else
+	{
+		animFloat1.resume();
+	}
+};
+
 void MediaObject::triggerPlay()
 {
-    
+
     ofLogNotice("MediaObject") << "Toggle object-" << UID << " to playing";
     
     switch(animType)
@@ -576,33 +592,50 @@ void MediaObject::triggerPlay()
         case LayerData::IMAGE_SEQUENCE:{ break;}
         case LayerData::TRAVERSING_2_POINT:{
             
-            
-            animFloat1.animateFromTo(0.0f, 1.0f);
+			genericPlay();
+
             break;
         }
         case LayerData::ROTATING:{
             animFloat1.setDuration(12);
-            animFloat1.animateFromTo(0.0f, 1.0f);
+			genericPlay();
             break;}
         case LayerData::STEM:{
-            animFloat1.reset(0.0f);
+
+			if (firstPlay)
+			{
+				animFloat1.reset(0.0f);
+				float delay = ofRandom(1.0f, 3.0f);
+				animFloat1.animateToAfterDelay(1.0f, delay);
+				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
+				firstPlay = false; 
+			}
+
+			animFloat1.resume();
             
-            float delay =  ofRandom(1.0f, 3.0f);
-            animFloat1.animateToAfterDelay(1.0f, delay);
-            //animFloat1.animateFromTo(0.0f, 1.0f);
-            
-            animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
             break;
         }
-        case LayerData::BOBBING:{ animFloat1.animateFromTo(0.0f, 1.0f); break; }
-        case LayerData::TRAVERSING_3_POINT:{ animFloat1.animateFromTo(0.0f, 1.0f); break;}
+        case LayerData::BOBBING:{ 
+			genericPlay();
+			break; 
+		}
+        case LayerData::TRAVERSING_3_POINT:{ 
+			genericPlay();
+			break;
+		}
         case LayerData::STATIC:{break;}
         case LayerData::TWO_PT_SWAY:{
-            float delay =  ofRandom(0.25f, 3.0f);
-            animFloat1.reset(0.0f);
-            animFloat1.animateToAfterDelay(1.0f, delay);
-            //animFloat1.animateFromTo(0.0f, 1.0f);
-            animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
+			if (firstPlay)
+			{
+				float delay = ofRandom(0.25f, 3.0f);
+				animFloat1.reset(0.0f);
+				animFloat1.animateToAfterDelay(1.0f, delay);
+				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
+				firstPlay = false; 
+			}
+
+			animFloat1.resume(); 
+
             break;
         }
         default:break;
@@ -614,7 +647,9 @@ void MediaObject::triggerPlay()
 
 void MediaObject::triggerStop()
 {
-    setAnimationState(AnimationState::BRIEF_PAUSE);
+	setAnimationState(AnimationState::STOPPED);
+    //No longer having a "BRIEF PAUSE"
+	//setAnimationState(AnimationState::BRIEF_PAUSE);
 }
 
 void MediaObject::makeAnimationVisble()
