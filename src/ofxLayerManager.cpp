@@ -18,12 +18,13 @@ ofxLayerManager::~ofxLayerManager()
     
 }
 
-void ofxLayerManager::setup()
+void ofxLayerManager::setup(string jsonLayersFile)
 {
     /*
      Parse Json
      */
-    
+
+	if(jsonLayersFile.size()) jsonFilePath = jsonLayersFile;
     bool parsingJson = jsonRef.open(jsonFilePath);
     
     if(parsingJson)

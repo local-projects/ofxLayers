@@ -18,7 +18,7 @@ public:
     ofxLayerManager();
     ~ofxLayerManager();
     
-    void setup();
+    void setup(string jsonLayersFile = "");
     void update(float dt);
     void draw(ofVec2f offset);
     
