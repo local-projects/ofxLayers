@@ -128,7 +128,7 @@ void MediaObject::draw(ofVec2f offset)
             
             if(debug)
             {
-                ofSetColor(ofColor::yellow);
+                ofSetColor(ofColor::magenta);
                 
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
                 ofDrawBitmapString(UID,
@@ -141,11 +141,11 @@ void MediaObject::draw(ofVec2f offset)
         }
         case LayerData::TRAVERSING_2_POINT:
         {
-            tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
+            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
            
             if(debug)
             {
-                ofSetColor(ofColor::yellow);
+                ofSetColor(ofColor::magenta);
                 
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
                 ofDrawBitmapString(UID + "\n" +
@@ -162,11 +162,11 @@ void MediaObject::draw(ofVec2f offset)
         case LayerData::ROTATING: {
             ofPushMatrix();
             
-            ofTranslate(int(pos.x + tex.getWidth()/2 + offset.x), int(pos.y + tex.getHeight()/2 + offset.y));
+            ofTranslate(pos.x + tex.getWidth()/2 + offset.x, pos.y + tex.getHeight()/2 + offset.y);
             
             ofRotateDeg(360.0f*animFloat1.val());
             
-            tex.draw(int(-tex.getWidth()/2), int(-tex.getHeight()/2));
+            tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
             
             ofPopMatrix();
             break;
@@ -248,13 +248,13 @@ void MediaObject::draw(ofVec2f offset)
         {
             
             ofPushMatrix();
-            ofTranslate(int(pos.x + offset.x), int(pos.y + offset.y));
+            ofTranslate(pos.x + offset.x, pos.y + offset.y);
             
             float rotationVal = bobRotation*animFloat1.val();
             float rotationValMapped = ofMap(rotationVal, 0, bobRotation, -bobRotation/2, bobRotation/2);
             ofRotateDeg(rotationValMapped);
 
-            tex.draw(int(-tex.getWidth()/2), int(-tex.getHeight()/2));
+            tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
             ofPopMatrix();
             break;
         }
@@ -269,7 +269,7 @@ void MediaObject::draw(ofVec2f offset)
             
             if(debug)
             {
-                ofSetColor(ofColor::yellow);
+                ofSetColor(ofColor::magenta);
                 
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
                 ofDrawBitmapString(UID + "\n" +
@@ -365,7 +365,7 @@ void MediaObject::draw(ofVec2f offset)
 
 void MediaObject::drawDebug()
 {
-    ofSetColor(ofColor::yellow);
+    ofSetColor(ofColor::magenta);
     
     ofDrawBitmapString("UID: " + UID + "\n" +
                        "layer: " + ofToString(layer) + "\n" +
