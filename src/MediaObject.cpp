@@ -123,7 +123,7 @@ void MediaObject::draw(ofVec2f offset)
     switch(animType)
     {
         case LayerData::IMAGE_SEQUENCE: {
-            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
+            tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
             
             
             if(debug)
@@ -141,7 +141,7 @@ void MediaObject::draw(ofVec2f offset)
         }
         case LayerData::TRAVERSING_2_POINT:
         {
-            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
+            tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
            
             if(debug)
             {
@@ -162,11 +162,11 @@ void MediaObject::draw(ofVec2f offset)
         case LayerData::ROTATING: {
             ofPushMatrix();
             
-            ofTranslate(pos.x + tex.getWidth()/2 + offset.x, pos.y + tex.getHeight()/2 + offset.y);
+            ofTranslate(int(pos.x + tex.getWidth()/2 + offset.x), int(pos.y + tex.getHeight()/2 + offset.y));
             
             ofRotateDeg(360.0f*animFloat1.val());
             
-            tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
+            tex.draw(int(-tex.getWidth()/2), int(-tex.getHeight()/2));
             
             ofPopMatrix();
             break;
@@ -248,13 +248,13 @@ void MediaObject::draw(ofVec2f offset)
         {
             
             ofPushMatrix();
-            ofTranslate(pos.x + offset.x, pos.y + offset.y);
+            ofTranslate(int(pos.x + offset.x), int(pos.y + offset.y));
             
             float rotationVal = bobRotation*animFloat1.val();
             float rotationValMapped = ofMap(rotationVal, 0, bobRotation, -bobRotation/2, bobRotation/2);
             ofRotateDeg(rotationValMapped);
 
-            tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
+            tex.draw(int(-tex.getWidth()/2), int(-tex.getHeight()/2));
             ofPopMatrix();
             break;
         }
@@ -284,7 +284,7 @@ void MediaObject::draw(ofVec2f offset)
             break;
         }
         case LayerData::STATIC: {
-            tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
+            tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
             break;
         }
         case LayerData::TWO_PT_SWAY: {
