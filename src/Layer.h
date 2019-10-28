@@ -38,7 +38,8 @@ public:
     MediaObject *getMediaObject( string UID);
     string getMediaObjectUID(int index); 
     int getNumMediaObjects();
-    
+	bool getHasBgImage(){return hasBgImage;}
+
 private:
     
     //! Visibility
