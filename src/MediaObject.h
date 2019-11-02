@@ -61,7 +61,10 @@ public:
     void setC_Pos(ofVec2f _C_Pos);
     
     //Texutre
-    void setTexture(ofTexture &_tex);
+	void setTexture(ofTexture &_tex);
+
+	//playback state
+	void setPlaybackProgress(float pct){animationProgress = pct;};
     
     //----- ANIMATIONS ---------
     
@@ -74,6 +77,7 @@ public:
         NUM_ANIMATION_STATES
     };
     AnimationState getAnimationState();
+	string toString(AnimationState s);
     
     //Playing & Stopping
     void triggerPlay();
@@ -141,6 +145,7 @@ private:
     //Animation state
     AnimationState animState = AnimationState::STOPPED;
     void setAnimationState(AnimationState _animState);
+	float animationProgress = 0.0f;
     
     // Pause
     ofxAnimatableFloat pause;

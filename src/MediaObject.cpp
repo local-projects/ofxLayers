@@ -126,17 +126,6 @@ void MediaObject::draw(ofVec2f offset)
             tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
             
             
-            if(debug)
-            {
-                ofSetColor(ofColor::magenta);
-                
-                ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
-                ofDrawBitmapString(UID,
-                                   debugPos.x,
-                                   debugPos.y);
-                
-                ofSetColor(255);
-            }
             break;
         }
         case LayerData::TRAVERSING_2_POINT:
@@ -365,14 +354,16 @@ void MediaObject::draw(ofVec2f offset)
 
 void MediaObject::drawDebug()
 {
-    ofSetColor(ofColor::magenta);
-    
-    ofDrawBitmapString("UID: " + UID + "\n" +
-                       "layer: " + ofToString(layer) + "\n" +
-                       "zoneUID: " + zoneUID + "\n" +
-                       "pos: " + ofToString(pos.x) + ", " + ofToString(pos.y), pos.x, pos.y);
-    
-    ofSetColor(255);
+	string msg =
+	"UID: " + UID + "\n" +
+	"layer: " + ofToString(layer) + "\n" +
+	"zoneUID: " + zoneUID + "\n" +
+	"pos: " + ofToString(pos.x) + ", " + ofToString(pos.y) + "\n" +
+	"state: " + toString(animState);
+	if(animationProgress > 0.0f){
+		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
+	}
+	ofDrawBitmapStringHighlight(msg, pos.x, pos.y, ofColor::black, ofColor::magenta);
 }
 
 #pragma mark ZONES
@@ -643,6 +634,16 @@ void MediaObject::triggerPlay()
     
     setAnimationState(AnimationState::PLAYING);
     
+}
+
+
+string MediaObject::toString(AnimationState s){
+	switch(animState){
+		case STOPPED: return "STOPPED";
+		case PLAYING: return "PLAYING";
+		case BRIEF_PAUSE: return "BRIEF_PAUSE";
+	}
+	return "AnimationState unknown state?";
 }
 
 void MediaObject::triggerStop()
