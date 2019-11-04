@@ -43,7 +43,7 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     
     pause.reset(0);
     pause.setRepeatType(PLAY_ONCE);
-    pause.setDuration(duration2);
+    pause.setDuration(0.01);
     pause.setCurve(LINEAR);
     ofAddListener(pause.animFinished, this, &MediaObject::onPauseFinish);
     
@@ -337,6 +337,16 @@ void MediaObject::drawDebug()
 	"zoneUID: " + zoneUID + "\n" +
 	"pos: " + ofToString(pos.x) + ", " + ofToString(pos.y) + "\n" +
 	"state: " + toString(animState);
+	if(pause.isAnimating()){
+		msg += "\npause Dur: " + ofToString(pause.getDuration());
+	}
+	if(animFloat1.isAnimating()){
+		msg += "\nanimFloat1 Dur: " + ofToString(animFloat1.getDuration());
+	}
+	if(animFloat2.isAnimating()){
+		msg += "\nanimFloat2 Dur: " + ofToString(animFloat2.getDuration());
+	}
+
 	if(animationProgress > 0.0f){
 		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
 	}
@@ -691,10 +701,10 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
     switch(animType)
     {
 		case LayerData::IMAGE_SEQUENCE:
-			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
         case LayerData::TRAVERSING_2_POINT:
         {
             pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
+			pause.animateFromTo(0.0f, 1.0f);
             setAnimationState(AnimationState::BRIEF_PAUSE);
             break;
         }
