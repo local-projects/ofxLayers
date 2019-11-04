@@ -70,14 +70,19 @@ void MediaObject::update(float dt)
     
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE: {break;}
+        case LayerData::IMAGE_SEQUENCE:
+			break;
+
         case LayerData::TRAVERSING_2_POINT:
-        {
             pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
             break;
-        }
-        case LayerData::ROTATING: { break;}
-        case LayerData::STEM: { break;}
+
+        case LayerData::ROTATING:
+			break;
+
+        case LayerData::STEM:
+			break;
+
         case LayerData::BOBBING:
         {
             pos.x = A_Pos.x + (bobDrift.x + randomnBobVal.x*ofNoise(time) )*animFloat1.val() + tex.getWidth()/2;
@@ -122,60 +127,45 @@ void MediaObject::draw(ofVec2f offset)
  
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE: {
+        case LayerData::IMAGE_SEQUENCE:
             tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
-            
-            
             break;
-        }
+
         case LayerData::TRAVERSING_2_POINT:
-        {
             tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
            
-            if(debug)
-            {
+            if(debug){
                 ofSetColor(ofColor::magenta);
-                
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
                 ofDrawBitmapString(UID + "\n" +
                                    "duration1:" + ofToString(duration1) + "\n",
                                    debugPos.x,
                                    debugPos.y);
-                
                 ofSetColor(255);
-            }
-            
-            
-            break;
-        }
-        case LayerData::ROTATING: {
+        	}break;
+
+        case LayerData::ROTATING:
             ofPushMatrix();
-            
             ofTranslate(pos.x + tex.getWidth()/2 + offset.x, pos.y + tex.getHeight()/2 + offset.y);
-            
             ofRotateDeg(360.0f*animFloat1.val());
-            
             tex.draw(-tex.getWidth()/2, -tex.getHeight()/2);
-            
             ofPopMatrix();
             break;
-        }
+
         case LayerData::STEM: {
-            
-            
             ofMesh mesh;
             mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
             
-            
+			const float val = animFloat1.val();
             //Create Values
-            float value0 = (*amplitudes[0])*animFloat1.val();
-            float value1 = (*amplitudes[1])*animFloat1.val();
-            float value2 = (*amplitudes[2])*animFloat1.val();
-            float value3 = (*amplitudes[3])*animFloat1.val();
-            float value4 = (*amplitudes[4])*animFloat1.val();
-            float value5 = (*amplitudes[5])*animFloat1.val();
-            float value6 = (*amplitudes[6])*animFloat1.val();
-            float value7 = (*amplitudes[7])*animFloat1.val();
+            float value0 = (*amplitudes[0]) * val;
+            float value1 = (*amplitudes[1]) * val;
+            float value2 = (*amplitudes[2]) * val;
+            float value3 = (*amplitudes[3]) * val;
+            float value4 = (*amplitudes[4]) * val;
+            float value5 = (*amplitudes[5]) * val;
+            float value6 = (*amplitudes[6]) * val;
+            float value7 = (*amplitudes[7]) * val;
             
             //Add positions
             ofVec3f ml = ofVec3f(A_Pos.x + value0, A_Pos.y + tex.getHeight()/2 + value1);
@@ -200,13 +190,9 @@ void MediaObject::draw(ofVec2f offset)
             mesh.addTexCoord(ofVec2f(1.0f, 1.0f)); //br
             mesh.addTexCoord(ofVec2f(0.0f, 1.0f)); //bl
             
-            
             tex.bind();
-            {
                 mesh.draw();
-            }
             tex.unbind();
-            
             
             if(meshDebug)
             {
@@ -228,14 +214,10 @@ void MediaObject::draw(ofVec2f offset)
                 ofDrawBitmapString("pos: amp[6], amp[7]", mr.x, mr.y);
                 ofFill();
                 ofSetColor(255);
-                
             }
-            
-            break;
-        }
-        case LayerData::BOBBING:
-        {
-            
+        }break;
+
+        case LayerData::BOBBING:{
             ofPushMatrix();
             ofTranslate(pos.x + offset.x, pos.y + offset.y);
             
@@ -247,9 +229,8 @@ void MediaObject::draw(ofVec2f offset)
             ofPopMatrix();
             break;
         }
+
         case LayerData::TRAVERSING_3_POINT: {
-            
-            
             //Three point traversing
             //Duraiton one is point A to B
             //Duraiton two is point C to A
@@ -262,31 +243,33 @@ void MediaObject::draw(ofVec2f offset)
                 
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
                 ofDrawBitmapString(UID + "\n" +
-                                   "duration1:" + ofToString(duration1) + "\n"
-                                   "duration2:" + ofToString(duration2) + "\n",
+                                   "duration1:" + ofToString(duration1,1) + "\n"
+                                   "duration2:" + ofToString(duration2,1) + "\n"
+								    "pauseDuration:" + ofToString(pauseDuration,1) + "\n",
                                    debugPos.x,
                                    debugPos.y);
                 
                 ofSetColor(255);
             }
-            
-            break;
-        }
+        }break;
+
         case LayerData::STATIC: {
             tex.draw(int(pos.x + offset.x), int(pos.y + offset.y), tex.getWidth(), tex.getHeight());
             break;
         }
+
         case LayerData::TWO_PT_SWAY: {
             
             ofMesh mesh;
             mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
             
-            
+            const float val = animFloat1.val();
+
             //Create Values
-            float value0 = (*amplitudes[0])*animFloat1.val();
-            float value1 = (*amplitudes[1])*animFloat1.val();
-            float value2 = (*amplitudes[2])*animFloat1.val();
-            float value3 = (*amplitudes[3])*animFloat1.val();
+			float value0 = (*amplitudes[0]) * val;
+            float value1 = (*amplitudes[1]) * val;
+            float value2 = (*amplitudes[2]) * val;
+            float value3 = (*amplitudes[3]) * val;
             
             //Add positions
             ofVec3f tl = ofVec3f(A_Pos.x + value0 , A_Pos.y + value1 );
@@ -305,18 +288,13 @@ void MediaObject::draw(ofVec2f offset)
             mesh.addTexCoord(ofVec2f(1, 0.0f));
             mesh.addTexCoord(ofVec2f(1, 1));
             mesh.addTexCoord(ofVec2f(0.0f, 1));
-            
-            
+
             tex.bind();
-            {
                 mesh.draw();
-            }
             tex.unbind();
 
-            
-            if(meshDebug)
-            {
-                
+            if(meshDebug){
+
                 ofSetColor(255, 0, 0);
                 ofNoFill();
                 
@@ -332,28 +310,27 @@ void MediaObject::draw(ofVec2f offset)
                 ofDrawBitmapString("pos: amp[2], amp[3]", tr.x, tr.y);
                 ofFill();
                 ofSetColor(255);
-                
-    
             }
-            
-            
-            
-            
-            break;
-        }
-        default:break;
+        }break;
+
+        default:
+			break;
     }
     
-    if(debug)
-    {
+    if(debug){
         drawDebug();
     }
-    
-    
 }
 
 void MediaObject::drawDebug()
 {
+
+	ofSetColor(ofColor::magenta);
+	ofNoFill();
+	ofDrawRectangle(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+	ofFill();
+	ofSetColor(255);
+
 	string msg =
 	"UID: " + UID + "\n" +
 	"layer: " + ofToString(layer) + "\n" +
@@ -363,7 +340,8 @@ void MediaObject::drawDebug()
 	if(animationProgress > 0.0f){
 		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
 	}
-	ofDrawBitmapStringHighlight(msg, pos.x, pos.y, ofColor::black, ofColor::magenta);
+	ofDrawBitmapStringHighlight(msg, pos.x, pos.y, ofColor(0,128), ofColor::magenta);
+
 }
 
 #pragma mark ZONES
@@ -410,8 +388,7 @@ void MediaObject::sendPlayNextObject()
     
     //Send event via notification center
     ofxNotificationCenter::Notification mnd;
-    mnd.ID = LayerIDManager::one().playNextObject;
-    
+
     if(nextUID.size())
     {
         mnd.data["next"] = nextUID;
@@ -425,8 +402,12 @@ void MediaObject::sendPlayNextObject()
 
 
     ofxNotificationCenter::one().postNotification(LayerIDManager::one().playNextObject, mnd);
-    makeAnimationInvisible(); 
+    //makeAnimationInvisible();
     
+}
+
+bool MediaObject::isSequentialObject(){
+	return isFirstSequentialObject() || isSecondSequentialObject();
 }
 
 
@@ -453,6 +434,20 @@ bool MediaObject::isSecondSequentialObject()
     {
         return false;
     }
+}
+
+string MediaObject::getNextOrPreviousObject(){
+
+	if (nextUID.size() && prevUID.size()){
+		ofLogError("MediaObject") << "getNextOrPreviousObject() this media object has both a NEXT and PREVIOUS object!";
+	}
+	if (nextUID.size()){
+		return nextUID;
+	}
+	if (prevUID.size()){
+		return prevUID;
+	}
+	return "";
 }
 
 #pragma mark GET
@@ -509,6 +504,12 @@ void MediaObject::setDuration2(float _duration2)
 {
     duration2 = _duration2;
 	animFloat2.setDuration(duration2);
+}
+
+void MediaObject::setPauseDuration(float _dur)
+{
+	pauseDuration = _dur;
+	pause.setDuration(pauseDuration);
 }
 
 
@@ -569,7 +570,11 @@ void MediaObject::genericPlay()
 	}
 	else
 	{
-		animFloat1.resume();
+		if(isSequentialObject() && animType == LayerData::AnimationType::IMAGE_SEQUENCE){ //sequential objects imgsequence re-start each other, not resume (bc they dont loop)
+			animFloat1.animateFromTo(0.0f, 1.0f);
+		}else{
+			animFloat1.resume();
+		}
 	}
 };
 
@@ -580,56 +585,51 @@ void MediaObject::triggerPlay()
     
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE:{ break;}
-        case LayerData::TRAVERSING_2_POINT:{
-            
+        case LayerData::IMAGE_SEQUENCE:
+        case LayerData::TRAVERSING_2_POINT:
 			genericPlay();
-
             break;
-        }
-        case LayerData::ROTATING:{
+
+        case LayerData::ROTATING:
             animFloat1.setDuration(12);
 			genericPlay();
-            break;}
-        case LayerData::STEM:{
+            break;
 
-			if (firstPlay)
-			{
+        case LayerData::STEM:
+			if (firstPlay){
 				animFloat1.reset(0.0f);
 				float delay = ofRandom(1.0f, 3.0f);
 				animFloat1.animateToAfterDelay(1.0f, delay);
 				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
 				firstPlay = false; 
 			}
-
 			animFloat1.resume();
-            
             break;
-        }
-        case LayerData::BOBBING:{ 
+
+        case LayerData::BOBBING:
 			genericPlay();
 			break; 
-		}
-        case LayerData::TRAVERSING_3_POINT:{ 
+
+        case LayerData::TRAVERSING_3_POINT:
 			genericPlay();
 			break;
-		}
-        case LayerData::STATIC:{break;}
-        case LayerData::TWO_PT_SWAY:{
-			if (firstPlay)
-			{
+
+        case LayerData::STATIC:
+			break;
+
+        case LayerData::TWO_PT_SWAY:
+			if (firstPlay){
 				float delay = ofRandom(0.25f, 3.0f);
 				animFloat1.reset(0.0f);
 				animFloat1.animateToAfterDelay(1.0f, delay);
 				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
 				firstPlay = false; 
 			}
-
-			animFloat1.resume(); 
-
+			animFloat1.resume();
             break;
-        }
-        default:break;
+
+        default:
+			break;
     }
     
     setAnimationState(AnimationState::PLAYING);
@@ -685,13 +685,13 @@ void MediaObject::setRandomnVariance(ofVec2f _randomnBobVal)
 
 void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
 {
-    
+
+	ofLogNotice() << "onAnim1Finish " << ofGetElapsedTimef();
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE:{ break;}
+		case LayerData::IMAGE_SEQUENCE:
         case LayerData::TRAVERSING_2_POINT:
         {
-            
             pause.animateFromTo(0.0f, 1.0f);
             setAnimationState(AnimationState::BRIEF_PAUSE);
             break;
@@ -770,9 +770,8 @@ void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
 {
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE:{ break;}
+        case LayerData::IMAGE_SEQUENCE:
         case LayerData::TRAVERSING_2_POINT:{
-            
             if(sequentialObj)
             {
                 sendPlayNextObject();

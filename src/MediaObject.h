@@ -42,6 +42,9 @@ public:
     void setPrevObject(string _prevUID);
     bool isFirstSequentialObject();
     bool isSecondSequentialObject();
+
+	bool isSequentialObject();
+	string getNextOrPreviousObject();
     
     /*
      Get Attributes
@@ -91,6 +94,7 @@ public:
     //LINEAR ANIMATIONS
     void setDuration1(float _duration1);
     void setDuration2(float _duration2);
+	void setPauseDuration(float pauseDuration);
     
     // BOBBING
     void setBobDrift(ofVec2f _bobDrift);
@@ -101,10 +105,7 @@ public:
     void onAnim1Finish(ofxAnimatable::AnimationEvent & event);
     void onAnim2Finish(ofxAnimatable::AnimationEvent & event);
     void onPauseFinish(ofxAnimatable::AnimationEvent & event);
-    
-    // Pause
-    void setPauseDuration(float );
-    
+
     //debug
     void setDebug(bool _debug);
     void setMeshDebug(bool _meshDebug);
@@ -161,7 +162,7 @@ private:
     ofxAnimatableFloat animFloat2;
     float duration2 = 2.0f;
 
-	bool firstPlay = true; 
+	bool firstPlay = true;
     
     //bobbing
     //! bobDrift is the amount of drift from the startPos in both the x + y

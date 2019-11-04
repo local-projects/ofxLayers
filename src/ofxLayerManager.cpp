@@ -109,7 +109,12 @@ void ofxLayerManager::setup(string jsonLayersFile)
                     
                     switch(animType)
                     {
-                        case LayerData::IMAGE_SEQUENCE: { break; }
+                        case LayerData::IMAGE_SEQUENCE: {
+							if(newMediaObj.isMember("pauseDuration")){
+								layers[layer.asInt()]->getMediaObject(uid)->setPauseDuration(newMediaObj["pauseDuration"].asFloat());
+							}
+							break;
+						}
                         case LayerData::TRAVERSING_2_POINT: {
                             
                             const ofxJSONElement & duration1 = newMediaObj["duration1"];

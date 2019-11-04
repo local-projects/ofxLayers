@@ -22,6 +22,7 @@ namespace LayerData {
         TRAVERSING_3_POINT, //5
         STATIC, //6,
         TWO_PT_SWAY, //7
+		//SPLIT_ANIMATION, //8 (single animation split in 2 img sequences, when one plays the other stops and disappears, back and forth) - using SequentialObject
        //CURVE,
         NUM_ANIMATION_TYPE //8
     };
