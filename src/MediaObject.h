@@ -112,7 +112,9 @@ public:
     
     //mesh
     void setAmplitude(int index, float* amplitude);
-    
+
+	bool isStaticImage = false; //false: animation; true: staticPNG
+
 private:
     
     //! Name of UID

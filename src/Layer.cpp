@@ -53,6 +53,13 @@ void Layer::draw(ofVec2f offset){
     }
 }
 
+void Layer::drawDebug(ofVec2f offset){
+	if(!isVisible) return;
+	for(auto &obj : mediaObjects){
+		obj.second->drawDebug();
+	}
+}
+
 #pragma mark VISIBILITY
 void Layer::setIsVisible(bool visible)
 {

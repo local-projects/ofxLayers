@@ -317,9 +317,9 @@ void MediaObject::draw(ofVec2f offset)
 			break;
     }
     
-    if(debug){
-        drawDebug();
-    }
+//    if(debug){
+//        drawDebug();
+//    }
 }
 
 void MediaObject::drawDebug()
@@ -329,7 +329,6 @@ void MediaObject::drawDebug()
 	ofNoFill();
 	ofDrawRectangle(pos.x, pos.y, tex.getWidth(), tex.getHeight());
 	ofFill();
-	ofSetColor(255);
 
 	string msg =
 	"UID: " + UID + "\n" +
@@ -351,6 +350,7 @@ void MediaObject::drawDebug()
 		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
 	}
 	ofDrawBitmapStringHighlight(msg, pos.x, pos.y, ofColor(0,128), ofColor::magenta);
+	ofSetColor(255);
 
 }
 
@@ -412,7 +412,7 @@ void MediaObject::sendPlayNextObject()
 
 
     ofxNotificationCenter::one().postNotification(LayerIDManager::one().playNextObject, mnd);
-    //makeAnimationInvisible();
+    makeAnimationInvisible();
     
 }
 
@@ -697,7 +697,7 @@ void MediaObject::setRandomnVariance(ofVec2f _randomnBobVal)
 void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
 {
 
-	ofLogNotice() << "onAnim1Finish " << ofGetElapsedTimef();
+	//ofLogNotice() << "onAnim1Finish " << ofGetElapsedTimef();
     switch(animType)
     {
 		case LayerData::IMAGE_SEQUENCE:

@@ -19,6 +19,7 @@ public:
     void setup();
     void update(float dt);
     void draw(ofVec2f offset);
+	void drawDebug(ofVec2f offset);
     
     //! Visibility
     void setIsVisible(bool visible);

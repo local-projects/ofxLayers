@@ -160,17 +160,19 @@ void ofxLayerManager::setup(string jsonLayersFile)
 						//pause duration is to be set in spreadsheet as a range, "float1-float2"
 						//so we can randomize pause durations
 						string pauseDurationInterval = newMediaObj["pauseDuration"].asString();
-						if(ofIsStringInString(pauseDurationInterval, "-")){
-							auto elements = ofSplitString(pauseDurationInterval, "-");
-							if(elements.size() == 2){
-								float low = ofToFloat(elements[0]);
-								float high = ofToFloat(elements[1]);
-								layers[layer.asInt()]->getMediaObject(uid)->setPauseDuration(low, high);
+						if(pauseDurationInterval.size()){
+							if(ofIsStringInString(pauseDurationInterval, "-")){
+								auto elements = ofSplitString(pauseDurationInterval, "-");
+								if(elements.size() == 2){
+									float low = ofToFloat(elements[0]);
+									float high = ofToFloat(elements[1]);
+									layers[layer.asInt()]->getMediaObject(uid)->setPauseDuration(low, high);
+								}else{
+									ofLogError("ofxLayerManager") << "bad syntax parsing pause duration! \"" << pauseDurationInterval << "\"";
+								}
 							}else{
 								ofLogError("ofxLayerManager") << "bad syntax parsing pause duration! \"" << pauseDurationInterval << "\"";
 							}
-						}else{
-							ofLogError("ofxLayerManager") << "bad syntax parsing pause duration! \"" << pauseDurationInterval << "\"";
 						}
 					}
 					
@@ -241,10 +243,10 @@ Layer* ofxLayerManager::getLayer(int index)
 
 MediaObject *ofxLayerManager::getMediaObject(string UID)
 {
+
 	auto layerInfo = animationsByLayer.find(UID); 
 	map<string, int>::iterator it = animationsByLayer.find(UID);
 	
-
 	if (it == animationsByLayer.end())
 	{
 		return nullptr;
