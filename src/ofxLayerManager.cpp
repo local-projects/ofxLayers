@@ -110,9 +110,6 @@ void ofxLayerManager::setup(string jsonLayersFile)
                     switch(animType)
                     {
                         case LayerData::IMAGE_SEQUENCE: {
-							if(newMediaObj.isMember("pauseDuration")){
-								layers[layer.asInt()]->getMediaObject(uid)->setPauseDuration(newMediaObj["pauseDuration"].asFloat());
-							}
 							break;
 						}
                         case LayerData::TRAVERSING_2_POINT: {
@@ -159,7 +156,24 @@ void ofxLayerManager::setup(string jsonLayersFile)
                     }
                                                                                               
                     
-                    
+					if(newMediaObj.isMember("pauseDuration")){
+						//pause duration is to be set in spreadsheet as a range, "float1-float2"
+						//so we can randomize pause durations
+						string pauseDurationInterval = newMediaObj["pauseDuration"].asString();
+						if(ofIsStringInString(pauseDurationInterval, "-")){
+							auto elements = ofSplitString(pauseDurationInterval, "-");
+							if(elements.size() == 2){
+								float low = ofToFloat(elements[0]);
+								float high = ofToFloat(elements[1]);
+								layers[layer.asInt()]->getMediaObject(uid)->setPauseDuration(low, high);
+							}else{
+								ofLogError("ofxLayerManager") << "bad syntax parsing pause duration! \"" << pauseDurationInterval << "\"";
+							}
+						}else{
+							ofLogError("ofxLayerManager") << "bad syntax parsing pause duration! \"" << pauseDurationInterval << "\"";
+						}
+					}
+					
                     animationsByZone.insert(pair<string, string>(ofToUpper(name.asString()), ofToUpper(zoneUID.asString()) ));
                 }
                 else

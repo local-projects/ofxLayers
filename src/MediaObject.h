@@ -94,7 +94,7 @@ public:
     //LINEAR ANIMATIONS
     void setDuration1(float _duration1);
     void setDuration2(float _duration2);
-	void setPauseDuration(float pauseDuration);
+	void setPauseDuration(float _durLow, float _durHigh);
     
     // BOBBING
     void setBobDrift(ofVec2f _bobDrift);
@@ -150,7 +150,8 @@ private:
     
     // Pause
     ofxAnimatableFloat pause;
-    float pauseDuration = 0.0f;
+    float pauseDurationLow = 0.0f;
+	float pauseDurationHigh = 0.0f;
     
     bool animationVisble = true;
     

@@ -245,7 +245,7 @@ void MediaObject::draw(ofVec2f offset)
                 ofDrawBitmapString(UID + "\n" +
                                    "duration1:" + ofToString(duration1,1) + "\n"
                                    "duration2:" + ofToString(duration2,1) + "\n"
-								    "pauseDuration:" + ofToString(pauseDuration,1) + "\n",
+								    "pauseDuration:" + ofToString(pauseDurationLow,1) + "-" + ofToString(pauseDurationHigh,1) + "\n",
                                    debugPos.x,
                                    debugPos.y);
                 
@@ -506,10 +506,11 @@ void MediaObject::setDuration2(float _duration2)
 	animFloat2.setDuration(duration2);
 }
 
-void MediaObject::setPauseDuration(float _dur)
+void MediaObject::setPauseDuration(float _durLow, float _durHigh)
 {
-	pauseDuration = _dur;
-	pause.setDuration(pauseDuration);
+	pauseDurationLow = _durLow ;
+	pauseDurationHigh = _durHigh ;
+	pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
 }
 
 
@@ -690,9 +691,10 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
     switch(animType)
     {
 		case LayerData::IMAGE_SEQUENCE:
+			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
         case LayerData::TRAVERSING_2_POINT:
         {
-            pause.animateFromTo(0.0f, 1.0f);
+            pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
             setAnimationState(AnimationState::BRIEF_PAUSE);
             break;
         }
@@ -730,6 +732,7 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
         {
          
             setAnimationState(AnimationState::BRIEF_PAUSE);
+			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
             pause.animateFromTo(0.0f, 1.0f);
             animFloat2.reset(0.0f);
             
@@ -756,6 +759,7 @@ void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
             
             
             setAnimationState(AnimationState::BRIEF_PAUSE);
+			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
             pause.animateFromTo(0.0f, 1.0f);
             
             break;
