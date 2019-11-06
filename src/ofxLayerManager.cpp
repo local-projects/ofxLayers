@@ -219,9 +219,10 @@ void ofxLayerManager::update(float dt)
 
 void ofxLayerManager::draw(ofVec2f offset)
 {
+	unordered_map<string, bool> toggles;
     for( auto & layer : layers)
     {
-        layer->draw(offset);
+        layer->draw(offset, toggles);
     }
 }
 
