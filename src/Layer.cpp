@@ -31,7 +31,7 @@ void Layer::update(float dt)
     }
 }
 
-void Layer::draw(ofVec2f offset){
+void Layer::draw(ofVec2f offset, unordered_map<string, bool> & drawToggles){
     
     if(!isVisible)
     {
@@ -44,19 +44,33 @@ void Layer::draw(ofVec2f offset){
         bgImage->draw(0.0f, 0.0f);
     }
 
-    
-    // Draw media Objects
-    for(auto &obj : mediaObjects)
-    {
-        obj.second->draw(offset);
-        //obj.second->drawDebug();
-    }
+	if(drawToggles.size()){ //selectively draw
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			auto it = drawToggles.find(obj.first);
+			if(it!= drawToggles.end() && it->second){
+				obj.second->draw(offset);
+			}
+		}
+	}else{
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			obj.second->draw(offset);
+		}
+	}
 }
 
-void Layer::drawDebug(ofVec2f offset){
+void Layer::drawDebug(ofVec2f offset, unordered_map<string, bool> & drawToggles){
 	if(!isVisible) return;
-	for(auto &obj : mediaObjects){
-		obj.second->drawDebug();
+	if(drawToggles.size()){ //selectively draw
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			auto it = drawToggles.find(obj.first);
+			if(it!= drawToggles.end() && it->second){
+				obj.second->drawDebug();
+			}
+		}
+	}else{
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			obj.second->drawDebug();
+		}
 	}
 }
 

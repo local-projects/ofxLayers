@@ -327,7 +327,11 @@ void MediaObject::drawDebug()
 
 	ofSetColor(ofColor::magenta);
 	ofNoFill();
-	ofDrawRectangle(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+	if(animType == LayerData::BOBBING ){
+		ofDrawRectangle(pos.x - tex.getWidth() * 0.5f, pos.y - tex.getHeight() * 0.5f, tex.getWidth(), tex.getHeight());
+	}else{
+		ofDrawRectangle(pos.x, pos.y, tex.getWidth(), tex.getHeight());
+	}
 	ofFill();
 
 	string msg =

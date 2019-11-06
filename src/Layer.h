@@ -18,8 +18,8 @@ public:
     
     void setup();
     void update(float dt);
-    void draw(ofVec2f offset);
-	void drawDebug(ofVec2f offset);
+    void draw(ofVec2f offset, unordered_map<string, bool> & drawToggles);
+	void drawDebug(ofVec2f offset, unordered_map<string, bool> & drawToggles);
     
     //! Visibility
     void setIsVisible(bool visible);
