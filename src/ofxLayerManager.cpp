@@ -224,9 +224,10 @@ void ofxLayerManager::setup(AnimationAssetManager * assetMan, string jsonLayersF
 
 void ofxLayerManager::update(float dt)
 {
+	unordered_map<string, bool> toggles;
     for( auto & layer : layers)
     {
-        layer->update(dt);
+        layer->update(dt, toggles);
     }
 }
 
