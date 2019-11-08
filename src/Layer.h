@@ -9,6 +9,8 @@
 #include "ofMain.h"
 #include "MediaObject.h"
 
+class ofxImageSequenceVideo;
+
 class Layer
 {
 public:
@@ -17,7 +19,7 @@ public:
     ~Layer();
     
     void setup();
-    void update(float dt);
+    void update(float dt, unordered_map<string, bool> & drawToggles);
     void draw(ofVec2f offset, unordered_map<string, bool> & drawToggles);
 	void drawDebug(ofVec2f offset, unordered_map<string, bool> & drawToggles);
     
@@ -34,7 +36,8 @@ public:
                         int zoneOrder,
                         string zoneUID,
                         int layer,
-                        LayerData::AnimationType animType);
+                        LayerData::AnimationType animType,
+						ofxImageSequenceVideo * video);
     
     MediaObject *getMediaObject( string UID);
     string getMediaObjectUID(int index); 
@@ -48,8 +51,8 @@ private:
     
     //! Media Objects
     ofImage * bgImage;
-    bool hasBgImage = false; 
-    
+    bool hasBgImage = false;
+
     //Replace this image with the media system
     map<string, MediaObject*> mediaObjects;
     vector<string> mediaObjectIds;

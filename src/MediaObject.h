@@ -12,6 +12,7 @@
 #include "ofxAnimatableFloat.h"
 #include "Global.h"
 #include "LayerIDManager.h"
+#include "ofxImageSequenceVideo.h"
 
 class MediaObject
 {
@@ -20,10 +21,12 @@ public:
     ~MediaObject();
     
     
-    void setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer);
+    void setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer, ofxImageSequenceVideo * imgSequence );
     void update(float dt);
     void draw(ofVec2f offset = ofVec2f(0.0f, 0.0f));
-    void drawDebug(); 
+    void drawDebug();
+
+	void reset();
     
     /*
      Set up attributes
@@ -32,7 +35,8 @@ public:
     void setPosition(ofVec2f _pos);
     void setLayer(int _layer);
     void setZone(int _zoneOrder, string _zoneUID);
-    
+
+	ofxImageSequenceVideo * getImgSequence(){return imgSequence;}
     
     /*
      Playing sequential objects
@@ -43,7 +47,7 @@ public:
     bool isFirstSequentialObject();
     bool isSecondSequentialObject();
 
-	bool isSequentialObject();
+	bool isSequentialObject(); //if true, this animaton consists of two image sequences; when one plays to the end, the next one triggers, and so on.
 	string getNextOrPreviousObject();
     
     /*
@@ -66,9 +70,6 @@ public:
     //Texutre
 	void setTexture(ofTexture &_tex);
 
-	//playback state
-	void setPlaybackProgress(float pct){animationProgress = pct;};
-    
     //----- ANIMATIONS ---------
     
     //Animation state
@@ -81,6 +82,8 @@ public:
     };
     AnimationState getAnimationState();
 	string toString(AnimationState s);
+
+	string toString(LayerData::AnimationType s);
     
     //Playing & Stopping
     void triggerPlay();
@@ -113,10 +116,11 @@ public:
     //mesh
     void setAmplitude(int index, float* amplitude);
 
-	bool isStaticImage = false; //false: animation; true: staticPNG
 
 private:
-    
+
+	ofxImageSequenceVideo * imgSequence = nullptr; //if the mediaObj is a plain static PNG, this will be null
+
     //! Name of UID
     string UID = "";
     
@@ -128,8 +132,7 @@ private:
     
     //! Layer of object
     int layer = 0;
-    
-    
+
     //! If this is empty, there is no object to playnext. If this is not empty, there is an object to play next.
     string nextUID = "";
     string prevUID = "";

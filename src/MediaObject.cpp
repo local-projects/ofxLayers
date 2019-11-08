@@ -19,8 +19,9 @@ MediaObject::~MediaObject()
 }
 
 
-void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer)
+void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer, ofxImageSequenceVideo * imgSequence)
 {
+	this->imgSequence = imgSequence;
     UID = _UID; 
     A_Pos = _pos;
     pos = _pos;
@@ -57,8 +58,17 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
         float* temp = new float;
         amplitudes.push_back(temp);
     }
-    
-    
+}
+
+void MediaObject::reset(){
+
+	triggerStop();
+	animFloat1.reset(0);
+	animFloat2.reset(0);
+	pause.reset(0);
+	setAnimationState(STOPPED);
+	pos = A_Pos;
+	firstPlay = true;
 }
 
 void MediaObject::update(float dt)
@@ -67,7 +77,11 @@ void MediaObject::update(float dt)
     animFloat1.update(dt);
     animFloat2.update(dt);
     pause.update(dt);
-    
+
+	if(imgSequence){
+		animationProgress = imgSequence->getPosition();
+	}
+
     switch(animType)
     {
         case LayerData::IMAGE_SEQUENCE:
@@ -135,13 +149,11 @@ void MediaObject::draw(ofVec2f offset)
             tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
            
             if(debug){
-                ofSetColor(ofColor::magenta);
                 ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
-                ofDrawBitmapString(UID + "\n" +
+                ofDrawBitmapStringHighlight(UID + "\n" +
                                    "duration1:" + ofToString(duration1) + "\n",
                                    debugPos.x,
-                                   debugPos.y);
-                ofSetColor(255);
+                                   debugPos.y, ofColor(0,200), ofColor::white);
         	}break;
 
         case LayerData::ROTATING:
@@ -237,20 +249,17 @@ void MediaObject::draw(ofVec2f offset)
             
             tex.draw(pos.x + offset.x, pos.y + offset.y, tex.getWidth(), tex.getHeight());
             
-            if(debug)
-            {
-                ofSetColor(ofColor::magenta);
-                
-                ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
-                ofDrawBitmapString(UID + "\n" +
-                                   "duration1:" + ofToString(duration1,1) + "\n"
-                                   "duration2:" + ofToString(duration2,1) + "\n"
-								    "pauseDuration:" + ofToString(pauseDurationLow,1) + "-" + ofToString(pauseDurationHigh,1) + "\n",
-                                   debugPos.x,
-                                   debugPos.y);
-                
-                ofSetColor(255);
-            }
+//            if(debug)
+//            {
+//                ofVec2f debugPos = ofVec2f(pos.x, pos.y + tex.getHeight());
+//                ofDrawBitmapStringHighlight(UID + "\n" +
+//                                   "duration1:" + ofToString(duration1,1) + "\n"
+//                                   "duration2:" + ofToString(duration2,1) + "\n"
+//								    "pauseDuration:" + ofToString(pauseDurationLow,1) + "-" + ofToString(pauseDurationHigh,1) + "\n",
+//                                   debugPos.x,
+//                                   debugPos.y,
+//								    ofColor(0,200), ofColor::white);
+//            }
         }break;
 
         case LayerData::STATIC: {
@@ -325,7 +334,30 @@ void MediaObject::draw(ofVec2f offset)
 void MediaObject::drawDebug()
 {
 
-	ofSetColor(ofColor::magenta);
+	ofColor textColor;
+	if(imgSequence){
+		textColor = ofColor::magenta;
+	}else{
+		textColor = ofColor::limeGreen;
+	}
+
+	ofSetColor(textColor);
+	const float offY = -8;
+
+	if(animType == LayerData::TRAVERSING_2_POINT){
+		ofDrawBitmapStringHighlight("A", A_Pos.x, A_Pos.y + offY);
+		ofDrawBitmapStringHighlight("B", B_Pos.x, B_Pos.y + offY);
+		ofLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
+	}
+
+	if(animType == LayerData::TRAVERSING_3_POINT){
+		ofDrawBitmapStringHighlight("A", A_Pos.x, A_Pos.y + offY);
+		ofDrawBitmapStringHighlight("B", B_Pos.x, B_Pos.y + offY);
+		ofDrawBitmapStringHighlight("C", C_Pos.x, C_Pos.y + offY);
+		ofLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
+		ofLine(C_Pos.x, C_Pos.y , B_Pos.x, B_Pos.y );
+	}
+
 	ofNoFill();
 	if(animType == LayerData::BOBBING ){
 		ofDrawRectangle(pos.x - tex.getWidth() * 0.5f, pos.y - tex.getHeight() * 0.5f, tex.getWidth(), tex.getHeight());
@@ -339,7 +371,9 @@ void MediaObject::drawDebug()
 	"layer: " + ofToString(layer) + "\n" +
 	"zoneUID: " + zoneUID + "\n" +
 	"pos: " + ofToString(pos.x) + ", " + ofToString(pos.y) + "\n" +
-	"state: " + toString(animState);
+	"state: " + toString(animState) + "\n" +
+	"type: " + toString(animType);
+
 	if(pause.isAnimating()){
 		msg += "\npause Dur: " + ofToString(pause.getDuration());
 	}
@@ -350,12 +384,11 @@ void MediaObject::drawDebug()
 		msg += "\nanimFloat2 Dur: " + ofToString(animFloat2.getDuration());
 	}
 
-	if(animationProgress > 0.0f){
+	if(imgSequence && animationProgress >= 0.0f){
 		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
 	}
-	ofDrawBitmapStringHighlight(msg, pos.x, pos.y, ofColor(0,128), ofColor::magenta);
+	ofDrawBitmapStringHighlight(msg, pos.x, pos.y + tex.getHeight() + 8, ofColor(0,200), textColor);
 	ofSetColor(255);
-
 }
 
 #pragma mark ZONES
@@ -653,12 +686,27 @@ void MediaObject::triggerPlay()
 
 
 string MediaObject::toString(AnimationState s){
-	switch(animState){
+	switch(s){
 		case STOPPED: return "STOPPED";
 		case PLAYING: return "PLAYING";
 		case BRIEF_PAUSE: return "BRIEF_PAUSE";
 	}
 	return "AnimationState unknown state?";
+}
+
+string MediaObject::toString(LayerData::AnimationType s){
+	switch(s){
+		case LayerData::IMAGE_SEQUENCE: return "IMAGE_SEQUENCE";
+		case LayerData::TRAVERSING_2_POINT: return "TRAVERSING_2_POINT";
+		case LayerData::ROTATING: return "ROTATING";
+		case LayerData::STEM: return "STEM";
+		case LayerData::BOBBING: return "BOBBING";
+		case LayerData::TRAVERSING_3_POINT: return "TRAVERSING_3_POINT";
+		case LayerData::STATIC: return "STATIC";
+		case LayerData::TWO_PT_SWAY: return "TWO_PT_SWAY";
+	}
+	ofLogError("MediaObject") << "toString() unknown LayerData::AnimationType!";
+	return "Unknown LayerData::AnimationType";
 }
 
 void MediaObject::triggerStop()

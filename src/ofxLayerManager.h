@@ -11,6 +11,8 @@
 #include "Layer.h"
 #include "ofxJson.h"
 
+class AnimationAssetManager;
+
 class ofxLayerManager
 {
 public:
@@ -18,7 +20,7 @@ public:
     ofxLayerManager();
     ~ofxLayerManager();
     
-    void setup(string jsonLayersFile = "");
+    void setup(AnimationAssetManager * canvasMan = nullptr, string jsonLayersFile = "");
     void update(float dt);
     void draw(ofVec2f offset);
     

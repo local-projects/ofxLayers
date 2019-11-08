@@ -23,12 +23,21 @@ void Layer::setup()
     
 }
 
-void Layer::update(float dt)
+void Layer::update(float dt, unordered_map<string, bool> & drawToggles)
 {
-    for(auto & obj : mediaObjects)
-    {
-        obj.second->update(dt);
-    }
+
+	if(drawToggles.size()){ //selectively draw
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			auto it = drawToggles.find(obj.first);
+			if(it!= drawToggles.end() && it->second){
+				obj.second->update(dt);
+			}
+		}
+	}else{
+		for(auto &obj : mediaObjects){ // Draw media Objects
+			obj.second->update(dt);
+		}
+	}
 }
 
 void Layer::draw(ofVec2f offset, unordered_map<string, bool> & drawToggles){
@@ -98,13 +107,14 @@ void Layer::addMediaObject(string UID,
                            int zoneOrder,
                            string zoneUID,
                            int layer,
-                           LayerData::AnimationType animType)
+                           LayerData::AnimationType animType,
+						   ofxImageSequenceVideo * video)
 {
     
     ofLogNotice("Layer::addMediaObject") << "Adding MediaObject-" << UID << " layer: " << layer;
     
     MediaObject * temp = new MediaObject();
-    temp->setup(ofToUpper(UID), pos, zoneOrder, zoneUID, layer);
+    temp->setup(ofToUpper(UID), pos, zoneOrder, zoneUID, layer, video);
     temp->setAnimationType(animType); 
     
     mediaObjects.insert(pair<string, MediaObject*>(ofToUpper(UID), temp));

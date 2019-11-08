@@ -7,6 +7,7 @@
 //
 
 #include "ofxLayerManager.h"
+#include "AnimationAssetManager.h"
 
 ofxLayerManager::ofxLayerManager()
 {
@@ -18,7 +19,7 @@ ofxLayerManager::~ofxLayerManager()
     
 }
 
-void ofxLayerManager::setup(string jsonLayersFile)
+void ofxLayerManager::setup(AnimationAssetManager * assetMan, string jsonLayersFile)
 {
     /*
      Parse Json
@@ -82,13 +83,25 @@ void ofxLayerManager::setup(string jsonLayersFile)
                     */
                     LayerData::AnimationType animType = static_cast<LayerData::AnimationType>(_animType.asInt());
                     string uid = ofToUpper(name.asString());
-                    
+
+					ofxImageSequenceVideo * anim = nullptr;
+
+					if(assetMan){
+						if(assetMan->isAnimation(uid)){
+							ofxImageSequenceVideo & video = assetMan->getAnimation(uid);
+							video.setPlaybackFramerate(fps.asFloat());
+							anim = &(video);
+						}
+					}
+
                     layers[layer.asInt()]->addMediaObject(uid,
                                                           ofVec2f(pos[0].asFloat(), pos[1].asFloat()),
                                                           zoneNum.asInt(),
                                                           zoneUID.asString(),
                                                           layer.asInt(),
-                                                          animType); //zone
+                                                          animType,
+															anim
+														  	); //zone
                     
                     
                     const ofxJSONElement & next = newMediaObj["next"];
