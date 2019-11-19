@@ -336,7 +336,12 @@ void MediaObject::drawDebug()
 
 	ofColor textColor;
 	if(imgSequence){
-		textColor = ofColor::magenta;
+		if(animState == PLAYING){
+			textColor = ofColor::red;
+		}else{
+			textColor = ofColor::magenta;
+		}
+
 	}else{
 		textColor = ofColor::limeGreen;
 	}
@@ -366,6 +371,7 @@ void MediaObject::drawDebug()
 	}
 	ofFill();
 
+	int lines = 8;
 	string msg =
 	"UID: " + UID + "\n" +
 	"layer: " + ofToString(layer) + "\n" +
@@ -375,19 +381,22 @@ void MediaObject::drawDebug()
 	"type: " + toString(animType);
 
 	if(pause.isAnimating()){
-		msg += "\npause Dur: " + ofToString(pause.getDuration());
+		msg += "\npause Dur: " + ofToString(pause.getDuration()); lines++;
 	}
 	if(animFloat1.isAnimating()){
-		msg += "\nanimFloat1 Dur: " + ofToString(animFloat1.getDuration());
+		msg += "\nanimFloat1 Dur: " + ofToString(animFloat1.getDuration()); lines++;
 	}
 	if(animFloat2.isAnimating()){
-		msg += "\nanimFloat2 Dur: " + ofToString(animFloat2.getDuration());
+		msg += "\nanimFloat2 Dur: " + ofToString(animFloat2.getDuration()); lines++;
 	}
 
-	if(imgSequence && animationProgress >= 0.0f){
-		msg += "\npct: " + ofToString(100.0f * animationProgress, 0);
+	if(imgSequence){
+		msg += "\nfr: " + ofToString(imgSequence->getPlaybackFramerate(),0) + "fps"; lines++;
 	}
-	ofDrawBitmapStringHighlight(msg, pos.x, pos.y + tex.getHeight() + 8, ofColor(0,200), textColor);
+	if(imgSequence && animationProgress >= 0.0f){
+		msg += "\npct: " + ofToString(100.0f * animationProgress, 1) + "%"; lines++;
+	}
+	ofDrawBitmapStringHighlight(msg, pos.x, pos.y + tex.getHeight() - 10 * lines, ofColor(0), textColor);
 	ofSetColor(255);
 }
 
