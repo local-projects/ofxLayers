@@ -27,7 +27,7 @@ public:
     void drawDebug();
 
 	void reset();
-    
+
     /*
      Set up attributes
      */
@@ -78,16 +78,17 @@ public:
         STOPPED,
         PLAYING,
         BRIEF_PAUSE,
+		SHOULD_STOP,
         NUM_ANIMATION_STATES
     };
-    AnimationState getAnimationState();
+	AnimationState getAnimationState();
 	string toString(AnimationState s);
 
 	string toString(LayerData::AnimationType s);
     
     //Playing & Stopping
-    void triggerPlay();
-    void triggerStop();
+    void triggerPlay(bool shouldStopAfterDone = false);
+    void triggerStop(bool stopRightNow); //if stopRightNow==true, stops mid-animation. if false, anim keeps playing til end then stops
 	void genericPlay(); 
 
     //Visibility
@@ -116,6 +117,11 @@ public:
     //mesh
     void setAmplitude(int index, float* amplitude);
 
+	//Animation state
+	AnimationState animState = AnimationState::STOPPED;
+	void setAnimationState(AnimationState _animState);
+
+	bool shouldPauseWhenReachingEnd = false;
 
 private:
 
@@ -148,9 +154,7 @@ private:
     
     //Animations
     
-    //Animation state
-    AnimationState animState = AnimationState::STOPPED;
-    void setAnimationState(AnimationState _animState);
+
 	float animationProgress = 0.0f;
     
     // Pause
@@ -169,7 +173,7 @@ private:
     float duration2 = 2.0f;
 
 	bool firstPlay = true;
-    
+
     //bobbing
     //! bobDrift is the amount of drift from the startPos in both the x + y
     ofVec2f bobDrift = ofVec2f(5.0, 10.0f);

@@ -44,7 +44,7 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     
     pause.reset(0);
     pause.setRepeatType(PLAY_ONCE);
-    pause.setDuration(0.01);
+    pause.setDuration(0.001);
     pause.setCurve(LINEAR);
     ofAddListener(pause.animFinished, this, &MediaObject::onPauseFinish);
     
@@ -60,15 +60,27 @@ void MediaObject::setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneU
     }
 }
 
+MediaObject::AnimationState MediaObject::getAnimationState(){
+	return animState;
+
+};
+
 void MediaObject::reset(){
 
-	triggerStop();
+	triggerStop(true);
 	animFloat1.reset(0);
 	animFloat2.reset(0);
 	pause.reset(0);
 	setAnimationState(STOPPED);
 	pos = A_Pos;
 	firstPlay = true;
+	shouldPauseWhenReachingEnd = false;
+	if(isSequentialObject()){
+		if(isFirstSequentialObject()) makeAnimationVisble();
+		if(isSecondSequentialObject()) makeAnimationInvisible();
+	}else{
+		makeAnimationVisble();
+	}
 }
 
 void MediaObject::update(float dt)
@@ -82,52 +94,54 @@ void MediaObject::update(float dt)
 		animationProgress = imgSequence->getPosition();
 	}
 
-    switch(animType)
-    {
-        case LayerData::IMAGE_SEQUENCE:
-			break;
+	//if(animState == PLAYING || animState == BRIEF_PAUSE || animState == SHOULD_STOP){
+		switch(animType){
+			case LayerData::IMAGE_SEQUENCE:
+				break;
 
-        case LayerData::TRAVERSING_2_POINT:
-            pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
-            break;
+			case LayerData::TRAVERSING_2_POINT:
+				pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
+				break;
 
-        case LayerData::ROTATING:
-			break;
+			case LayerData::ROTATING:
+				break;
 
-        case LayerData::STEM:
-			break;
+			case LayerData::STEM:
+				break;
 
-        case LayerData::BOBBING:
-        {
-            pos.x = A_Pos.x + (bobDrift.x + randomnBobVal.x*ofNoise(time) )*animFloat1.val() + tex.getWidth()/2;
-            pos.y = A_Pos.y + (bobDrift.y + randomnBobVal.y*ofNoise(time) )*animFloat1.val() + tex.getHeight()/2;
-            break;
-        }
-        case LayerData::TRAVERSING_3_POINT: {
-            
-            
-            //Three point traversing
-            //Duraiton one is point A to B
-            //Duraiton two is point C to A
-            
-            if(animFloat1.isAnimating())
-            {
-                pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
-            }
-            else if(animFloat2.isAnimating())
-            {
-                pos = C_Pos + (A_Pos - C_Pos)*animFloat2.val();
-            }
-            
-            break;
-        }
-        case LayerData::STATIC: { break;}
-        case LayerData::TWO_PT_SWAY: { break;}
-        default:break;
-    }
+			case LayerData::BOBBING:
+			{
+				pos.x = A_Pos.x + (bobDrift.x + randomnBobVal.x*ofNoise(time) )*animFloat1.val() + tex.getWidth()/2;
+				pos.y = A_Pos.y + (bobDrift.y + randomnBobVal.y*ofNoise(time) )*animFloat1.val() + tex.getHeight()/2;
+				break;
+			}
+			case LayerData::TRAVERSING_3_POINT: {
+				//Three point traversing
+				//Duraiton one is point A to B
+				//Duraiton two is point C to A
 
-    
-    
+				if(animFloat1.isAnimating())
+				{
+					pos = A_Pos + (B_Pos - A_Pos)*animFloat1.val();
+				}
+				else if(animFloat2.isAnimating())
+				{
+					pos = C_Pos + (A_Pos - C_Pos)*animFloat2.val();
+				}
+
+				break;
+			}
+			case LayerData::STATIC: { break;}
+			case LayerData::TWO_PT_SWAY: { break;}
+			default:break;
+		}
+	//}
+
+	if((animState == PLAYING || animState == SHOULD_STOP) && imgSequence && !imgSequence->isPlaying()){
+		//correct wrong state leak, if we have movie and its not playing, we are not playing
+		//ofLogNotice("MediaObject") << "state leak correction on " << UID << " , we are now stopped";
+		animState = STOPPED;
+	}
 }
 
 void MediaObject::draw(ofVec2f offset)
@@ -335,16 +349,11 @@ void MediaObject::drawDebug()
 {
 
 	ofColor textColor;
-	if(imgSequence){
-		if(animState == PLAYING){
-			textColor = ofColor::red;
-		}else{
-			textColor = ofColor::magenta;
-		}
+	if(animState == PLAYING) textColor = ofColor::red;
+	if(animState == STOPPED) textColor = ofColor::magenta;
+	if(animState == BRIEF_PAUSE) textColor = ofColor::gray;
+	if(animState == SHOULD_STOP) textColor = ofColor::orange;
 
-	}else{
-		textColor = ofColor::limeGreen;
-	}
 
 	ofSetColor(textColor);
 	const float offY = -8;
@@ -371,30 +380,43 @@ void MediaObject::drawDebug()
 	}
 	ofFill();
 
-	int lines = 8;
+	int lines = 7;
 	string msg =
-	"UID: " + UID + "\n" +
-	"layer: " + ofToString(layer) + "\n" +
-	"zoneUID: " + zoneUID + "\n" +
+	UID + "\n" +
+	"Layer: " + ofToString(layer) + "  Zone: " + zoneUID + "\n" +
 	"pos: " + ofToString(pos.x) + ", " + ofToString(pos.y) + "\n" +
-	"state: " + toString(animState) + "\n" +
-	"type: " + toString(animType);
+	"State: " + toString(animState) + "\n" +
+	"Type: " + toString(animType);
 
 	if(pause.isAnimating()){
-		msg += "\npause Dur: " + ofToString(pause.getDuration()); lines++;
+		msg += "\nPause Dur: " + ofToString(pause.getDuration(),1);
+		msg += "  pct: " + ofToString(pause.getPercentDone() * 100,1);
+		lines++;
 	}
 	if(animFloat1.isAnimating()){
-		msg += "\nanimFloat1 Dur: " + ofToString(animFloat1.getDuration()); lines++;
+		msg += "\nAnimFloat1 Dur: " + ofToString(animFloat1.getDuration(),1);
+		msg += "  pct: " + ofToString(animFloat1.getPercentDone() * 100,1);
+		lines++;
 	}
 	if(animFloat2.isAnimating()){
-		msg += "\nanimFloat2 Dur: " + ofToString(animFloat2.getDuration()); lines++;
+		msg += "\nAnimFloat2 Dur: " + ofToString(animFloat2.getDuration(),1);
+		msg += "  pct: " + ofToString(animFloat2.getPercentDone() * 100,1);
+		lines++;
 	}
 
 	if(imgSequence){
-		msg += "\nfr: " + ofToString(imgSequence->getPlaybackFramerate(),0) + "fps"; lines++;
+		msg += "\nFr: " + ofToString(imgSequence->getPlaybackFramerate(),0) + "fps";
+		msg += "  Visible: " + string(animationVisble ? "YES" : "NO");
+		lines++;
 	}
 	if(imgSequence && animationProgress >= 0.0f){
-		msg += "\npct: " + ofToString(100.0f * animationProgress, 1) + "%"; lines++;
+		msg += "\nPct: " + ofToString(100.0f * animationProgress, 1) + "%";
+		msg += "  ImgSeq: " + string(imgSequence->isPlaying() ? "PLAY" : "STOP");
+		lines++;
+	}
+	if(isSequentialObject()){
+		msg += "\nSequential! nextObj: " + getNextOrPreviousObject();
+		lines++;
 	}
 	ofDrawBitmapStringHighlight(msg, pos.x, pos.y + tex.getHeight() - 10 * lines, ofColor(0), textColor);
 	ofSetColor(255);
@@ -439,27 +461,21 @@ void MediaObject::setPrevObject(string _prevUID)
     animationVisble = false;
 }
 
-void MediaObject::sendPlayNextObject()
-{
-    
-    //Send event via notification center
+void MediaObject::sendPlayNextObject(){
+
     ofxNotificationCenter::Notification mnd;
 
-    if(nextUID.size())
-    {
-        mnd.data["next"] = nextUID;
-        ofLogNotice("MediaObject") << UID << " send play next object " << nextUID;
-    }
-    else
-    {
-        mnd.data["next"] = prevUID;
-        ofLogNotice("MediaObject") << UID << " send play next object " << prevUID;
-    }
-
+	if(nextUID.size()){
+		mnd.data["next"] = nextUID;
+		//ofLogNotice("MediaObject") << UID << " send play next object " << nextUID;
+	}else{
+		mnd.data["next"] = prevUID;
+		//ofLogNotice("MediaObject") << UID << " send play next object " << prevUID;
+	}
+	mnd.data["shouldPause"] = shouldPauseWhenReachingEnd;
 
     ofxNotificationCenter::one().postNotification(LayerIDManager::one().playNextObject, mnd);
     makeAnimationInvisible();
-    
 }
 
 bool MediaObject::isSequentialObject(){
@@ -594,28 +610,31 @@ void MediaObject::setAnimationState(AnimationState _animState)
 {
     animState  = _animState;
     
-    switch(animState)
-    {
-        case AnimationState::STOPPED: 
-		{
-			animFloat1.pause(); 
-			animFloat2.pause(); 
-            break;
-        }
-            case AnimationState::PLAYING: {
-            makeAnimationVisble();
-            break;
-        }
-        case AnimationState::BRIEF_PAUSE: {
-            
-            if(animType == LayerData::TWO_PT_SWAY || animType == LayerData::STEM)
-            {
-                animFloat1.setRepeatType(LOOP_BACK_AND_FORTH_ONCE);
-            }
-            break;
-        }
-        default: break;
-    }
+	switch(animState)
+	{
+		case AnimationState::STOPPED:
+			animFloat1.pause();
+			animFloat2.pause();
+			shouldPauseWhenReachingEnd = false;
+			break;
+
+		case AnimationState::SHOULD_STOP:
+			shouldPauseWhenReachingEnd = true;
+			break;
+
+		case AnimationState::PLAYING:
+			makeAnimationVisble();
+			shouldPauseWhenReachingEnd = false;
+			break;
+
+		case AnimationState::BRIEF_PAUSE:
+			if(animType == LayerData::TWO_PT_SWAY || animType == LayerData::STEM){
+				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH_ONCE);
+			}
+			break;
+
+		default: break;
+	}
 }
 
 void MediaObject::genericPlay()
@@ -628,15 +647,16 @@ void MediaObject::genericPlay()
 	else
 	{
 		if(isSequentialObject() && animType == LayerData::AnimationType::IMAGE_SEQUENCE){ //sequential objects imgsequence re-start each other, not resume (bc they dont loop)
-			animFloat1.animateFromTo(0.0f, 1.0f);
+			if(animState == AnimationState::STOPPED){ //dont re-trigger animation timers (ugh) if we are to play but we were already playing, otherwise the img sequence and the anim timer get off-sync
+				animFloat1.animateFromTo(0.0f, 1.0f);
+			}
 		}else{
 			animFloat1.resume();
 		}
 	}
 };
 
-void MediaObject::triggerPlay()
-{
+void MediaObject::triggerPlay(bool shouldStopAfterDone){
 
     ofLogNotice("MediaObject") << "Toggle object-" << UID << " to playing";
     
@@ -688,9 +708,12 @@ void MediaObject::triggerPlay()
         default:
 			break;
     }
-    
-    setAnimationState(AnimationState::PLAYING);
-    
+
+	if(shouldStopAfterDone){
+		setAnimationState(AnimationState::SHOULD_STOP);
+	}else{
+		setAnimationState(AnimationState::PLAYING);
+	}
 }
 
 
@@ -699,6 +722,7 @@ string MediaObject::toString(AnimationState s){
 		case STOPPED: return "STOPPED";
 		case PLAYING: return "PLAYING";
 		case BRIEF_PAUSE: return "BRIEF_PAUSE";
+		case SHOULD_STOP: return "SHOULD_STOP";
 	}
 	return "AnimationState unknown state?";
 }
@@ -718,11 +742,35 @@ string MediaObject::toString(LayerData::AnimationType s){
 	return "Unknown LayerData::AnimationType";
 }
 
-void MediaObject::triggerStop()
+void MediaObject::triggerStop(bool stopRightNow)
 {
-	setAnimationState(AnimationState::STOPPED);
-    //No longer having a "BRIEF PAUSE"
-	//setAnimationState(AnimationState::BRIEF_PAUSE);
+
+	if(stopRightNow){
+
+		setAnimationState(AnimationState::STOPPED);
+
+	}else{ //some anim types are endless, so we stop they right now
+			//anims that have an img sequence or have a set path, will stop when anim is done or path is all walked.
+
+		switch (animType) {
+			case LayerData::IMAGE_SEQUENCE:
+			case LayerData::TRAVERSING_2_POINT:
+			case LayerData::TRAVERSING_3_POINT:
+				setAnimationState(AnimationState::SHOULD_STOP);
+				break;
+
+			case LayerData::STATIC:
+			case LayerData::ROTATING:
+			case LayerData::STEM:
+			case LayerData::BOBBING:
+			case LayerData::TWO_PT_SWAY:
+				setAnimationState(AnimationState::STOPPED);
+				break;
+
+			default:
+				break;
+		}
+	}
 }
 
 void MediaObject::makeAnimationVisble()
@@ -758,55 +806,69 @@ void MediaObject::setRandomnVariance(ofVec2f _randomnBobVal)
 void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
 {
 
-	//ofLogNotice() << "onAnim1Finish " << ofGetElapsedTimef();
+	//ofLogNotice("MediaObject") << "onAnim1Finish " << UID;
     switch(animType)
     {
 		case LayerData::IMAGE_SEQUENCE:
         case LayerData::TRAVERSING_2_POINT:
         {
-            pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
-			pause.animateFromTo(0.0f, 1.0f);
-            setAnimationState(AnimationState::BRIEF_PAUSE);
-            break;
+			if(animState == PLAYING || animState == SHOULD_STOP){
+
+				if(isSequentialObject() && isSecondSequentialObject()){ // 2nd part of seq anim, we don't pause at all
+					pause.setDuration(0.0);
+				}else{
+					pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
+				}
+				pause.animateFromTo(0.0f, 1.0f);
+				setAnimationState(AnimationState::BRIEF_PAUSE);
+			}
+			break;
         }
         case LayerData::ROTATING:
         {
             
-            if(animState == AnimationState::PLAYING)
-            {
+            if(animState == AnimationState::PLAYING){
                 animFloat1.animateFromTo(0.0f, 1.0f);
             }
+			if(animState == SHOULD_STOP){
+				reset();
+			}
             break;
         }
         case LayerData::STEM:{
-            if(animState == AnimationState::PLAYING)
-            {
+            if(animState == AnimationState::PLAYING){
                 animFloat1.animateFromTo(0.0f, 1.0f);
             }
+			if(animState == SHOULD_STOP){
+				reset();
+			}
             break;
         }
         case LayerData::BOBBING:
         {
             //ofLogNotice() << "animFloat1.val(): " << animFloat1.val();
             
-            if(animState == AnimationState::PLAYING && animFloat1.val() == 1)
-            {
+            if(animState == AnimationState::PLAYING && animFloat1.val() == 1){
                 animFloat1.animateFromTo(1.0f, 0.0f);
             }
             else if (animFloat1.val() == 0.0)
             {
                 animFloat1.animateFromTo(0.0f, 1.0f);
             }
+
+			if(animState == SHOULD_STOP){
+				reset();
+			}
+
             break;
         }
         case LayerData::TRAVERSING_3_POINT:
         {
-         
+			//for this type, if we are SHOULD_STOP, we stop at the end of the 2nd animation
             setAnimationState(AnimationState::BRIEF_PAUSE);
 			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
             pause.animateFromTo(0.0f, 1.0f);
             animFloat2.reset(0.0f);
-            
             break;
         }
         case LayerData::STATIC:{break;}
@@ -819,74 +881,90 @@ void MediaObject::onAnim1Finish(ofxAnimatable::AnimationEvent & event)
 
 void MediaObject::onAnim2Finish(ofxAnimatable::AnimationEvent & event)
 {
+	//ofLogNotice("MediaObject") << "onAnim2Finish " << UID;
     switch(animType)
     {
-        case LayerData::IMAGE_SEQUENCE:{ break;}
-        case LayerData::TRAVERSING_2_POINT:{break;}
-        case LayerData::ROTATING:{break;}
-        case LayerData::STEM:{break;}
-        case LayerData::BOBBING:{ break; }
-        case LayerData::TRAVERSING_3_POINT:{
-            
-            
-            setAnimationState(AnimationState::BRIEF_PAUSE);
-			pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
-            pause.animateFromTo(0.0f, 1.0f);
-            
-            break;
-        }
+        case LayerData::IMAGE_SEQUENCE:
+			break;
+        case LayerData::TRAVERSING_2_POINT:
+			break;
+        case LayerData::ROTATING:
+			break;
+        case LayerData::STEM:
+			break;
+        case LayerData::BOBBING:
+			break;
+
+		case LayerData::TRAVERSING_3_POINT:
+			if(animState == PLAYING){
+				setAnimationState(AnimationState::BRIEF_PAUSE);
+				pause.setDuration(ofRandom(pauseDurationLow, pauseDurationHigh));
+				pause.animateFromTo(0.0f, 1.0f);
+			}
+			if(animState == SHOULD_STOP){
+				reset();
+			}
+			break;
+
         case LayerData::STATIC:{break;}
         case LayerData::TWO_PT_SWAY:{break;}
         default:break;
     }
+
 }
 
 void MediaObject::onPauseFinish(ofxAnimatable::AnimationEvent & event)
 {
-    switch(animType)
-    {
-        case LayerData::IMAGE_SEQUENCE:
-        case LayerData::TRAVERSING_2_POINT:{
-            if(sequentialObj)
-            {
-                sendPlayNextObject();
-                setAnimationState(MediaObject::STOPPED);
-            }
-            else
-            {
-                animFloat1.animateFromTo(0.0f, 1.0f); 
-            }
-            
-            break;
-        }
-        case LayerData::ROTATING:{break;}
-        case LayerData::STEM:{break;}
-        case LayerData::BOBBING:{ break; }
-        case LayerData::TRAVERSING_3_POINT:{
-            
-            
-            if(animState == AnimationState::BRIEF_PAUSE && !animFloat2.val())
-            {
-                animFloat2.animateFromTo(0.0f, 1.0f);
-                setAnimationState(MediaObject::PLAYING);
-            }
-            else if(sequentialObj)
-            {
-                sendPlayNextObject();
-                setAnimationState(MediaObject::STOPPED); 
-            }
-            else
-            {
-                animFloat1.animateFromTo(0.0f, 1.0f);
-                setAnimationState(MediaObject::PLAYING);
-            }
-            
-            break;
-        }
-        case LayerData::STATIC:{break;}
-        case LayerData::TWO_PT_SWAY:{break;}
-        default:break;
-    }
+	switch(animType)
+	{
+		case LayerData::IMAGE_SEQUENCE:
+		case LayerData::TRAVERSING_2_POINT:{
+
+			if(sequentialObj){ //compound obj, 2 MO linked
+				sendPlayNextObject();
+				setAnimationState(MediaObject::STOPPED);
+
+			}else{ //simple obj
+
+				if(shouldPauseWhenReachingEnd){
+					setAnimationState(MediaObject::SHOULD_STOP);
+				}else{
+					setAnimationState(MediaObject::PLAYING);
+				}
+				animFloat1.animateFromTo(0.0f, 1.0f);
+			}
+			break;
+		}
+		case LayerData::ROTATING:{break;}
+		case LayerData::STEM:{break;}
+		case LayerData::BOBBING:{ break; }
+		case LayerData::TRAVERSING_3_POINT:{
+
+			if(animState == AnimationState::BRIEF_PAUSE && !animFloat2.val()){
+				animFloat2.animateFromTo(0.0f, 1.0f);
+				if(shouldPauseWhenReachingEnd){
+					setAnimationState(MediaObject::SHOULD_STOP);
+				}else{
+					setAnimationState(MediaObject::PLAYING);
+				}
+			}
+			else if(sequentialObj)
+			{
+				sendPlayNextObject();
+				setAnimationState(MediaObject::STOPPED);
+			}
+			else
+			{
+				animFloat1.animateFromTo(0.0f, 1.0f);
+				setAnimationState(MediaObject::PLAYING); //TODO: unclear what happens here
+				ofLogError("MediaObject") << "onPauseFinish() THIS CASE NEEDS CHECKING! TODO!";
+			}
+			break;
+		}
+		case LayerData::STATIC:{break;}
+		case LayerData::TWO_PT_SWAY:{break;}
+		default:break;
+	}
 
 }
 
