@@ -194,12 +194,12 @@ void MediaObject::draw(ofVec2f offset)
             float value7 = (*amplitudes[7]) * val;
             
             //Add positions
-            ofVec3f ml = ofVec3f(A_Pos.x + value0, A_Pos.y + tex.getHeight()/2 + value1);
-            ofVec3f tl = ofVec3f(A_Pos.x + value2, A_Pos.y  + value3);
-            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth() + value4, A_Pos.y + value5 );
-            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth() + value6, A_Pos.y + tex.getHeight()/2 + value7));
-            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()));
-            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()));
+            ofVec3f ml = ofVec3f(A_Pos.x + offset.x + value0, A_Pos.y + offset.y + tex.getHeight()/2 + value1);
+            ofVec3f tl = ofVec3f(A_Pos.x + offset.x + value2, A_Pos.y + offset.y + value3);
+            ofVec3f tr = ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value4, A_Pos.y + offset.y + value5 );
+            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value6, A_Pos.y + offset.y + tex.getHeight()/2 + value7));
+            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth(), A_Pos.y + offset.y + tex.getHeight()));
+            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x + offset.x , A_Pos.y + offset.y + tex.getHeight()));
         
             
             mesh.addVertex(ml); //half left
@@ -295,10 +295,10 @@ void MediaObject::draw(ofVec2f offset)
             float value3 = (*amplitudes[3]) * val;
             
             //Add positions
-            ofVec3f tl = ofVec3f(A_Pos.x + value0 , A_Pos.y + value1 );
-            ofVec3f tr = ofVec3f(A_Pos.x + tex.getWidth() + value2, A_Pos.y + value3 );
-            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + tex.getWidth(), A_Pos.y + tex.getHeight()));
-            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x, A_Pos.y + tex.getHeight()));
+            ofVec3f tl = ofVec3f(A_Pos.x + offset.x + value0 , A_Pos.y + offset.y + value1 );
+            ofVec3f tr = ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value2, A_Pos.y + offset.y + value3 );
+            ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth(), A_Pos.y + offset.y + tex.getHeight()));
+            ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x + offset.x, A_Pos.y + offset.y + tex.getHeight()));
             
             //Add verticies
             mesh.addVertex(tl); //top left
