@@ -107,6 +107,18 @@ void MediaObject::update(float dt)
 				break;
 
 			case LayerData::STEM:
+				if(animFloat1.isAnimating() && animFloat1.getPercentDone() <= 0.005){ //randomize duration of stems on every loop to have more randomness
+					animFloat1.setDuration(duration1 * ofRandom(0.8, 1.0f/0.8f));
+					int ran = ofGetFrameNum()%9;
+					switch(ran){ //some change that we will change anim curve
+						case 0: animFloat1.setCurve(EASE_IN_EASE_OUT); break;
+						case 1: animFloat1.setCurve(TANH); break;
+						case 2: animFloat1.setCurve(SWIFT_GOOGLE); break;
+						case 3: animFloat1.setCurve(SMOOTHER_STEP); break;
+						case 4: animFloat1.setCurve(EASE_IN_OUT_BACK); break;
+						default: break;
+					};
+				}
 				break;
 
 			case LayerData::BOBBING:
@@ -182,26 +194,28 @@ void MediaObject::draw(ofVec2f offset)
             ofMesh mesh;
             mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
             
-			const float val = animFloat1.val();
+			const float val = animFloat1.val(); // range is [0..1]
+			float v2 = (val - 0.5) * 2; // remap range to [-1,1]
             //Create Values
-            float value0 = (*amplitudes[0]) * val;
-            float value1 = (*amplitudes[1]) * val;
-            float value2 = (*amplitudes[2]) * val;
-            float value3 = (*amplitudes[3]) * val;
-            float value4 = (*amplitudes[4]) * val;
-            float value5 = (*amplitudes[5]) * val;
-            float value6 = (*amplitudes[6]) * val;
-            float value7 = (*amplitudes[7]) * val;
+            float value0 = (*amplitudes[0]) * v2;
+            float value1 = (*amplitudes[1]) * v2;
+            float value2 = (*amplitudes[2]) * v2;
+            float value3 = (*amplitudes[3]) * v2;
+            float value4 = (*amplitudes[4]) * v2;
+            float value5 = (*amplitudes[5]) * v2;
+            float value6 = (*amplitudes[6]) * v2;
+            float value7 = (*amplitudes[7]) * v2;
             
             //Add positions
+			ofVec3f tl = ofVec3f(A_Pos.x + offset.x + value2, A_Pos.y + offset.y + value3);
+			ofVec3f tr = ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value4, A_Pos.y + offset.y + value5 );
+
             ofVec3f ml = ofVec3f(A_Pos.x + offset.x + value0, A_Pos.y + offset.y + tex.getHeight()/2 + value1);
-            ofVec3f tl = ofVec3f(A_Pos.x + offset.x + value2, A_Pos.y + offset.y + value3);
-            ofVec3f tr = ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value4, A_Pos.y + offset.y + value5 );
-            ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value6, A_Pos.y + offset.y + tex.getHeight()/2 + value7));
+			ofVec3f mr = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth() + value6, A_Pos.y + offset.y + tex.getHeight()/2 + value7));
+
             ofVec3f br = ofVec3f(ofVec3f(A_Pos.x + offset.x + tex.getWidth(), A_Pos.y + offset.y + tex.getHeight()));
             ofVec3f bl = ofVec3f(ofVec3f(A_Pos.x + offset.x , A_Pos.y + offset.y + tex.getHeight()));
-        
-            
+                    
             mesh.addVertex(ml); //half left
             mesh.addVertex(tl); //top left
             mesh.addVertex(tr); // top right
@@ -233,7 +247,7 @@ void MediaObject::draw(ofVec2f offset)
                 
                 ofDrawRectangle(tl.x, tl.y, tex.getWidth(), tex.getHeight());
                 
-                ofSetColor(ofColor::pink);
+                ofSetColor(ofColor::brown);
                 ofDrawBitmapString("pos: amp[0], amp[1]", ml.x - debugPos, ml.y);
                 ofDrawBitmapString("pos: amp[2], amp[3]", tl.x - debugPos, tl.y);
                 ofDrawBitmapString("pos: amp[4], amp[5]", tr.x, tr.y);
@@ -395,7 +409,7 @@ void MediaObject::drawDebug()
 	}
 	if(animFloat1.isAnimating()){
 		msg += "\nAnimFloat1 Dur: " + ofToString(animFloat1.getDuration(),1);
-		msg += "  pct: " + ofToString(animFloat1.getPercentDone() * 100,1);
+		msg += "  pct: " + ofToString(animFloat1.getPercentDone() * 100,1) + "  val: " + ofToString(animFloat1.val(), 2);
 		lines++;
 	}
 	if(animFloat2.isAnimating()){
@@ -675,7 +689,7 @@ void MediaObject::triggerPlay(bool shouldStopAfterDone){
         case LayerData::STEM:
 			if (firstPlay){
 				animFloat1.reset(0.0f);
-				float delay = ofRandom(1.0f, 3.0f);
+				float delay = ofRandom(0.1f, 4.0f);
 				animFloat1.animateToAfterDelay(1.0f, delay);
 				animFloat1.setRepeatType(LOOP_BACK_AND_FORTH);
 				firstPlay = false; 
