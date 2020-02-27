@@ -73,12 +73,12 @@ void Layer::drawDebug(ofVec2f offset, unordered_map<string, bool> & drawToggles)
 		for(auto &obj : mediaObjects){ // Draw media Objects
 			auto it = drawToggles.find(obj.first);
 			if(it!= drawToggles.end() && it->second){
-				obj.second->drawDebug();
+				obj.second->drawDebug(offset);
 			}
 		}
 	}else{
 		for(auto &obj : mediaObjects){ // Draw media Objects
-			obj.second->drawDebug();
+			obj.second->drawDebug(offset);
 		}
 	}
 }

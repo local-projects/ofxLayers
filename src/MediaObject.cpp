@@ -371,31 +371,33 @@ void MediaObject::draw(ofVec2f offset)
 	//    }
 }
 
-void MediaObject::drawDebug()
+void MediaObject::drawDebug(ofVec2f offset)
 {
 
+	ofPushMatrix();
+	ofTranslate(offset.x, offset.y);
 	ofColor textColor;
 	if(animState == PLAYING) textColor = ofColor::red;
 	if(animState == STOPPED) textColor = ofColor::magenta;
 	if(animState == BRIEF_PAUSE) textColor = ofColor::gray;
 	if(animState == SHOULD_STOP) textColor = ofColor::orange;
 
-
 	ofSetColor(textColor);
 	const float offY = -8;
 
 	if(animType == LayerData::TRAVERSING_2_POINT){
-		ofDrawBitmapStringHighlight("A", A_Pos.x, A_Pos.y + offY);
-		ofDrawBitmapStringHighlight("B", B_Pos.x, B_Pos.y + offY);
-		ofLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
+		ofDrawBitmapStringHighlight("A [" + ofToString(A_Pos.x + offset.x,0) + ", " + ofToString(A_Pos.y + offset.y,0) + "]", A_Pos.x, A_Pos.y + offY);
+		ofDrawBitmapStringHighlight("B [(]" + ofToString(B_Pos.x + offset.x,0) + ", " + ofToString(B_Pos.y + offset.y,0) + "]", B_Pos.x, B_Pos.y + offY);
+		ofDrawLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
 	}
 
 	if(animType == LayerData::TRAVERSING_3_POINT){
-		ofDrawBitmapStringHighlight("A", A_Pos.x, A_Pos.y + offY);
-		ofDrawBitmapStringHighlight("B", B_Pos.x, B_Pos.y + offY);
-		ofDrawBitmapStringHighlight("C", C_Pos.x, C_Pos.y + offY);
-		ofLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
-		ofLine(C_Pos.x, C_Pos.y , B_Pos.x, B_Pos.y );
+		ofDrawBitmapStringHighlight("A [" + ofToString(A_Pos.x + offset.x,0) + ", " + ofToString(A_Pos.y + offset.y,0) + "]", A_Pos.x, A_Pos.y + offY);
+		ofDrawBitmapStringHighlight("B [" + ofToString(B_Pos.x + offset.x,0) + ", " + ofToString(B_Pos.y + offset.y,0) + "]", B_Pos.x, B_Pos.y + offY);
+		ofDrawBitmapStringHighlight("C [" + ofToString(C_Pos.x + offset.x,0) + ", " + ofToString(C_Pos.y + offset.y,0) + "]", C_Pos.x, C_Pos.y + offY);
+
+		ofDrawLine(A_Pos.x, A_Pos.y , B_Pos.x, B_Pos.y );
+		ofDrawLine(C_Pos.x, C_Pos.y , A_Pos.x, A_Pos.y );
 	}
 
 	ofNoFill();
@@ -410,7 +412,7 @@ void MediaObject::drawDebug()
 	string msg =
 	UID + "\n" +
 	"Layer: " + ofToString(layer) + "  Zone: " + zoneUID + "\n" +
-	"pos: " + ofToString(pos.x) + ", " + ofToString(pos.y) + "\n" +
+	"pos: " + ofToString(pos.x + offset.x,1) + ", " + ofToString(pos.y + offset.y,1) + "\n" +
 	"State: " + toString(animState) + "\n" +
 	"Type: " + toString(animType);
 
@@ -447,6 +449,7 @@ void MediaObject::drawDebug()
 	}
 	ofDrawBitmapStringHighlight(msg, pos.x, pos.y + tex.getHeight() - 10 * lines, sequential ? ofColor(22,22,55) : ofColor::black, textColor);
 	ofSetColor(255);
+	ofPopMatrix();
 }
 
 #pragma mark ZONES

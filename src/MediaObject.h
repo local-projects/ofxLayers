@@ -24,7 +24,7 @@ public:
     void setup(string _UID, ofVec2f _pos, int _zoneOrder, string _zoneUID, int _layer, ofxImageSequenceVideo * imgSequence );
     void update(float dt);
     void draw(ofVec2f offset = ofVec2f(0.0f, 0.0f));
-    void drawDebug();
+    void drawDebug(ofVec2f offset = ofVec2f(0.0f, 0.0f));
 
 	void reset();
 
